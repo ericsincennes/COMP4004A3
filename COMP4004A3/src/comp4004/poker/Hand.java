@@ -14,26 +14,26 @@ public class Hand {
 	private List<Card> hand;
 	
 	public enum Strength {
-		Royal, StraFlus, FourOK, FullHouse, Flush, Straight, ThreeOK, TwoPair, OnePair, HighCard 
+		Royal, StrFlush, FourOK, FullHouse, Flush, Straight, ThreeOK, TwoPair, OnePair, HighCard 
 	}
 	
 	protected Strength strength = Strength.HighCard;
-	protected CardSuit highSuit;
+	protected Card tieBreaker;
 	
 	public Strength getStrength() {
 		return strength;
 	}
 	
-	public CardSuit getHighSuit() {
-		return highSuit;
+	public Card getTieBreaker() {
+		return tieBreaker;
 	}
 	
 	public void setStrength(Strength str) {
 		strength = str;
 	}
 	
-	public void setHighSuit(CardSuit hs) {
-		highSuit = hs;
+	public void setTieBreaker(Card tb) {
+		tieBreaker = tb;
 	}
 	
 	public Hand(){

@@ -18,7 +18,6 @@ public class RulesEngine {
 	private List<Card> exchangeList;
 	private int numPlayers = 0, expectedPlayers, expectedai;
 	private Deck deck, discard;
-	private boolean colourChosen = false;
 	private int highestScore = 0;
 
 	public RulesEngine(int i, int j){
@@ -48,14 +47,6 @@ public class RulesEngine {
 		return highestScore;
 	}
 	
-	/**
-	 * Returns if a colour has been chosen for the current tournament
-	 * to allow for normal play to begin
-	 * @return boolean
-	 */
-	public boolean isColourChosen() {
-		return isRunning() && colourChosen;
-	}
 	
 	/**
 	 * Registers a player with the Rules engine
@@ -124,7 +115,6 @@ public class RulesEngine {
 		for(Player p : playersList){
 			p.setPlaying(true);
 		}
-		colourChosen = false;
 	}
 	
 	
@@ -203,103 +193,135 @@ public class RulesEngine {
 		Hand hand = getPlayerById(id).getHand();
 		List<Card> h = getPlayerById(id).getHand().getHand();
 		Collections.sort(h);
-		if (isFOK(h)) {
+		if (isFOK(h, hand)) {
 			hand.setStrength(Strength.FourOK);
-		} else if (isFH(h)) {
+		} else if (isFH(h, hand)) {
 			hand.setStrength(Strength.FullHouse);
-		} else if (isTOK(h)) {
+		} else if (isTOK(h, hand)) {
 			hand.setStrength(Strength.ThreeOK); 
-		} else if (isTP(h)) {
+		} else if (isTP(h, hand)) {
 			hand.setStrength(Strength.TwoPair);
-		} else if (isOP(h)) {
+		} else if (isOP(h, hand)) {
 			hand.setStrength(Strength.OnePair);
-		} else if (isStr(h)) {
+		} else if (isStr(h, hand)) {
 			hand.setStrength(Strength.Straight);
-		} else if (isRoyal(h)) {
+		} else if (isRoyal(h, hand)) {
 			hand.setStrength(Strength.Royal);
-		} else if (isStrFlu(h)) {
-			hand.setStrength(Strength.StraFlus);
-		} else if (isFlush(h)) {
+		} else if (isStrFlu(h, hand)) {
+			hand.setStrength(Strength.StrFlush);
+		} else if (isFlush(h, hand)) {
 			hand.setStrength(Strength.Flush);
 		} else {
 			hand.setStrength(Strength.HighCard);
+			hand.setTieBreaker(h.get(4));
 		}
 	}
 	
-	public boolean isFOK(List<Card> h) {
+	public boolean isFOK(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(3).getCardValue() || h.get(1).getCardValue() == h.get(4).getCardValue()) {
+			hand.setTieBreaker(h.get(1));
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean isFH(List<Card> h) {
+	public boolean isFH(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(2).getCardValue() && h.get(3).getCardValue() == h.get(4).getCardValue()) {
+			hand.setTieBreaker(h.get(0));
 			return true;
 		} else if (h.get(2).getCardValue() == h.get(4).getCardValue() && h.get(0).getCardValue() == h.get(1).getCardValue()) {
+			hand.setTieBreaker(h.get(4));
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean isTOK(List<Card> h) {
+	public boolean isTOK(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(2).getCardValue() && h.get(3).getCardValue() != h.get(4).getCardValue()) {
+			hand.setTieBreaker(h.get(0));
 			return true;
 		} else if (h.get(2).getCardValue() == h.get(4).getCardValue() && h.get(0).getCardValue() != h.get(1).getCardValue()) {
+			hand.setTieBreaker(h.get(4));
 			return true;
 		} else if (h.get(1).getCardValue() == h.get(3).getCardValue()) {
+			hand.setTieBreaker(h.get(1));
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean isTP(List<Card> h) {
-		if (h.get(0).getCardValue() == h.get(1).getCardValue() && (h.get(2).getCardValue() == h.get(3).getCardValue() || h.get(3).getCardValue() == h.get(4).getCardValue())) {
+	public boolean isTP(List<Card> h, Hand hand) {
+		if (h.get(0).getCardValue() == h.get(1).getCardValue() && h.get(2).getCardValue() == h.get(3).getCardValue()) {
+			if (h.get(0).getCardValue() > h.get(2).getCardValue()) {
+				hand.setTieBreaker(h.get(0));
+			} else {
+				hand.setTieBreaker(h.get(2));
+			}
+			return true;
+		} else if (h.get(0).getCardValue() == h.get(1).getCardValue() && h.get(3).getCardValue() == h.get(4).getCardValue()) {
+			if (h.get(0).getCardValue() > h.get(3).getCardValue()) {
+				hand.setTieBreaker(h.get(0));
+			} else {
+				hand.setTieBreaker(h.get(3));
+			}
 			return true;
 		} else if (h.get(1).getCardValue() == h.get(2).getCardValue() && h.get(3).getCardValue() == h.get(4).getCardValue()) {
+			if (h.get(1).getCardValue() > h.get(3).getCardValue()) {
+				hand.setTieBreaker(h.get(1));
+			} else {
+				hand.setTieBreaker(h.get(3));
+			}
 			return true;
 		} 
 		return false;
 	}
 	
-	public boolean isOP(List<Card> h) {
+	public boolean isOP(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(1).getCardValue() && (h.get(2).getCardValue() != h.get(3).getCardValue() && h.get(3).getCardValue() != h.get(4).getCardValue())) {
+			hand.setTieBreaker(h.get(0));
 			return true;
 		} else if (h.get(1).getCardValue() == h.get(2).getCardValue() && (h.get(0).getCardValue() != h.get(3).getCardValue() && h.get(3).getCardValue() != h.get(4).getCardValue())) {
+			hand.setTieBreaker(h.get(1));
 			return true;
 		} else if (h.get(2).getCardValue() == h.get(3).getCardValue() && (h.get(0).getCardValue() != h.get(1).getCardValue() && h.get(1).getCardValue() != h.get(4).getCardValue())) {
+			hand.setTieBreaker(h.get(2));
 			return true;
 		} else if (h.get(3).getCardValue() == h.get(4).getCardValue() && (h.get(0).getCardValue() != h.get(1).getCardValue() && h.get(1).getCardValue() != h.get(2).getCardValue())) {
+			hand.setTieBreaker(h.get(3));
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean isStr(List<Card> h) {
+	public boolean isStr(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(1).getCardValue()+1 && (h.get(0).getCardValue() == h.get(2).getCardValue()+2 
 						&& h.get(0).getCardValue() == h.get(3).getCardValue()+3 && h.get(0).getCardValue() == h.get(4).getCardValue()+4)) {
+			hand.setTieBreaker(h.get(4));
 			return true;
 		} 
 		return false;
 	}
 	
-	public boolean isFlush(List<Card> h) {
+	public boolean isFlush(List<Card> h, Hand hand) {
 		if (h.get(0).getCardSuit() == h.get(1).getCardSuit() && (h.get(0).getCardSuit() == h.get(2).getCardSuit() 
 				&& h.get(0).getCardSuit() == h.get(3).getCardSuit() && h.get(0).getCardSuit() == h.get(4).getCardSuit())) {
+			hand.setTieBreaker(h.get(4));
 			return true;
 		} 
 		return false;
 	}
 	
-	public boolean isStrFlu(List<Card> h) {
-		if (isFlush(h) && isStr(h)) {
+	public boolean isStrFlu(List<Card> h, Hand hand) {
+		if (isFlush(h, hand) && isStr(h, hand)) {
+			hand.setTieBreaker(h.get(4));
 			return true;
 		}
 		return false;
 	}
 	
-	public boolean isRoyal(List<Card> h) {
-		if (isStrFlu(h) && h.get(0).getCardValue() == 1 && h.get(4).getCardValue() == 13) {
+	public boolean isRoyal(List<Card> h, Hand hand) {
+		if (isStrFlu(h, hand) && h.get(0).getCardValue() == 1 && h.get(4).getCardValue() == 13) {
+			hand.setTieBreaker(h.get(4));
 			return true;
 		}
 		return false;
@@ -331,23 +353,47 @@ public class RulesEngine {
 			}
 		}
 		highestScore = 0;
-		colourChosen = false;
 	}
-	/*
+	
 	/**
 	 * checks if there is a winner to the game yet
 	 * @returns the winning player or null if none exist
-	 *
+	 */
 	public Player gameWinner() {
+		Player winner = null;
 		for (Player p : playersList) {
 			if (numPlayers < 2) return p;
-			if (p.hasWinningHand()) {
-				return p;
+			determineHandStrength(p.getID());
+		}
+		
+		for (Player p : playersList) {
+			if (winner == null) {
+				winner = p;
+			} else {
+				if (winner.getHand().getStrength().ordinal() > p.getHand().getStrength().ordinal()) {
+					winner = p;
+				} else if (winner.getHand().getStrength() == p.getHand().getStrength()) {
+					switch (winner.getHand().getStrength()) {
+						case Royal:
+						if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
+							winner = p;
+						}
+						return winner;
+						case StrFlush:
+						if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+							winner = p;
+						} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
+							
+						}
+						default:
+							return null;
+					}
+				} 
 			}
 		}
 		return null;
 	}
-	*/
+	
 	/**
 	 * Convenience function
 	 * @param s String to be printed

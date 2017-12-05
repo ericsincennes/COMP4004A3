@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class Card implements Serializable, Comparable<Card>{
 	
 	public enum CardSuit {
-		Spades, Hearts, Diamonds, Clubs
+		Spades, Hearts, Clubs, Diamonds
 	}
 	
 	protected String cardName;
