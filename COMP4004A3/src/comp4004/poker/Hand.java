@@ -19,6 +19,8 @@ public class Hand {
 	
 	protected Strength strength = Strength.HighCard;
 	protected Card tieBreaker;
+	protected Card pTieBreaker;
+	protected Card high;
 	
 	public Strength getStrength() {
 		return strength;
@@ -26,6 +28,14 @@ public class Hand {
 	
 	public Card getTieBreaker() {
 		return tieBreaker;
+	}
+	
+	public Card getPTieBreaker() {
+		return pTieBreaker;
+	}
+	
+	public Card getHigh() {
+		return high;
 	}
 	
 	public void setStrength(Strength str) {
@@ -36,6 +46,13 @@ public class Hand {
 		tieBreaker = tb;
 	}
 	
+	public void setPTieBreaker(Card ptb) {
+		pTieBreaker = ptb;
+	}
+	
+	public void setHigh(Card h) {
+		high = h;
+	}
 	public Hand(){
 		hand = new ArrayList<Card>();
 	}

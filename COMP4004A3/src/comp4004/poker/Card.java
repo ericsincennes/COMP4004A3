@@ -19,7 +19,7 @@ public class Card implements Serializable, Comparable<Card>{
 	public Card(CardSuit suit, int value) {
 		cardSuit = suit;
 		cardValue = value;
-		if (value == 1) {
+		if (value == 14) {
 			cardName = "Ace of " + suit.name();
 		} else if (value == 11) {
 			cardName = "Jack of " + suit.name();
@@ -45,9 +45,7 @@ public class Card implements Serializable, Comparable<Card>{
 	}
 	
 	public int compareTo(Card compCard) {
-
 		int compValue = ((Card) compCard).getCardValue();
-
 		return this.cardValue - compValue;
 	}
 }

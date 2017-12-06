@@ -254,22 +254,34 @@ public class RulesEngine {
 		if (h.get(0).getCardValue() == h.get(1).getCardValue() && h.get(2).getCardValue() == h.get(3).getCardValue()) {
 			if (h.get(0).getCardValue() > h.get(2).getCardValue()) {
 				hand.setTieBreaker(h.get(0));
+				hand.setPTieBreaker(h.get(2));
+				hand.setHigh(h.get(4));
 			} else {
 				hand.setTieBreaker(h.get(2));
+				hand.setPTieBreaker(h.get(0));
+				hand.setHigh(h.get(4));
 			}
 			return true;
 		} else if (h.get(0).getCardValue() == h.get(1).getCardValue() && h.get(3).getCardValue() == h.get(4).getCardValue()) {
 			if (h.get(0).getCardValue() > h.get(3).getCardValue()) {
 				hand.setTieBreaker(h.get(0));
+				hand.setPTieBreaker(h.get(3));
+				hand.setHigh(h.get(2));
 			} else {
 				hand.setTieBreaker(h.get(3));
+				hand.setPTieBreaker(h.get(0));
+				hand.setHigh(h.get(2));
 			}
 			return true;
 		} else if (h.get(1).getCardValue() == h.get(2).getCardValue() && h.get(3).getCardValue() == h.get(4).getCardValue()) {
 			if (h.get(1).getCardValue() > h.get(3).getCardValue()) {
 				hand.setTieBreaker(h.get(1));
+				hand.setPTieBreaker(h.get(3));
+				hand.setHigh(h.get(0));
 			} else {
 				hand.setTieBreaker(h.get(3));
+				hand.setPTieBreaker(h.get(1));
+				hand.setHigh(h.get(0));
 			}
 			return true;
 		} 
@@ -279,15 +291,19 @@ public class RulesEngine {
 	public boolean isOP(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(1).getCardValue() && (h.get(2).getCardValue() != h.get(3).getCardValue() && h.get(3).getCardValue() != h.get(4).getCardValue())) {
 			hand.setTieBreaker(h.get(0));
+			hand.setPTieBreaker(h.get(4));
 			return true;
 		} else if (h.get(1).getCardValue() == h.get(2).getCardValue() && (h.get(0).getCardValue() != h.get(3).getCardValue() && h.get(3).getCardValue() != h.get(4).getCardValue())) {
 			hand.setTieBreaker(h.get(1));
+			hand.setPTieBreaker(h.get(4));
 			return true;
 		} else if (h.get(2).getCardValue() == h.get(3).getCardValue() && (h.get(0).getCardValue() != h.get(1).getCardValue() && h.get(1).getCardValue() != h.get(4).getCardValue())) {
 			hand.setTieBreaker(h.get(2));
+			hand.setPTieBreaker(h.get(4));
 			return true;
 		} else if (h.get(3).getCardValue() == h.get(4).getCardValue() && (h.get(0).getCardValue() != h.get(1).getCardValue() && h.get(1).getCardValue() != h.get(2).getCardValue())) {
 			hand.setTieBreaker(h.get(3));
+			hand.setPTieBreaker(h.get(2));
 			return true;
 		}
 		return false;
@@ -375,16 +391,91 @@ public class RulesEngine {
 				} else if (winner.getHand().getStrength() == p.getHand().getStrength()) {
 					switch (winner.getHand().getStrength()) {
 						case Royal:
-						if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
-							winner = p;
-						}
-						return winner;
+							if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
+								winner = p;
+							}
+							return winner;
 						case StrFlush:
-						if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-							winner = p;
-						} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
-							
-						}
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
+									winner = p;
+								}
+							}
+							return winner;
+						case FourOK:
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							}
+							return winner;
+						case FullHouse:
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							}
+							return winner;
+						case Flush:
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
+									winner = p;
+								}
+							}
+							return winner;
+						case Straight:
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
+									winner = p;
+								}
+							}
+							return winner;
+						case ThreeOK:
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							}
+							return winner;
+						case TwoPair:
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getPTieBreaker().getCardValue() < p.getHand().getPTieBreaker().getCardValue()) {
+									winner = p;
+								} else if (winner.getHand().getPTieBreaker().getCardValue() == p.getHand().getPTieBreaker().getCardValue()) {
+									if (winner.getHand().getHigh().getCardValue() < p.getHand().getHigh().getCardValue()) {
+										winner = p;
+									} else if (winner.getHand().getHigh().getCardValue() == p.getHand().getHigh().getCardValue()) {
+										if (winner.getHand().getHigh().getCardSuit().ordinal() > p.getHand().getHigh().getCardSuit().ordinal()) {
+											winner = p;
+										}
+									}
+								}
+							}
+							return winner;
+						case OnePair:
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getPTieBreaker().getCardValue() < p.getHand().getPTieBreaker().getCardValue()) {
+									winner = p;
+								} else if (winner.getHand().getPTieBreaker().getCardValue() == p.getHand().getPTieBreaker().getCardValue()) {
+									if (winner.getHand().getPTieBreaker().getCardSuit().ordinal() > p.getHand().getPTieBreaker().getCardSuit().ordinal()) {
+										winner = p;
+									}
+								}
+							}
+							return winner;
+						case HighCard:
+							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
+								winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
+									winner = p;
+								}
+							}
+							return winner;
 						default:
 							return null;
 					}

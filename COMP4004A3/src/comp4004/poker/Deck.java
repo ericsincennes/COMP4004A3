@@ -28,7 +28,7 @@ public class Deck {
 	 * Initialize the standard deck with 52 cards.
 	 */
 	public void initDeck(){
-		for(int i=0; i<13; i++){
+		for(int i=1; i<14; i++){
 			cards.add(new Card(CardSuit.Spades, (i+1)));
 			cards.add(new Card(CardSuit.Hearts, (i+1)));
 			cards.add(new Card(CardSuit.Diamonds, (i+1)));
