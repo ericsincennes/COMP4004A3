@@ -1,0 +1,10 @@
+Dec 05, 2017 9:11:28 PM comp4004.poker.testcases.Log <init>
+INFO: Logger Configured
+Dec 05, 2017 9:12:00 PM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 1
+Dec 05, 2017 9:12:00 PM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 2
+Dec 05, 2017 9:12:00 PM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 starting up.
+Dec 05, 2017 9:12:00 PM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 starting up.
