@@ -26,13 +26,7 @@ public class Client {
 
 	public static void main(String[] args){
 		Client p = new Client();
-		Scanner in = new Scanner(System.in);
-		print("Enter an IP address for the game: ");
-		String ip = in.nextLine();
-		print("Enter a port for the game: ");
-		int port = in.nextInt();
-		in.close();
-		p.connect(ip,port);
+		p.connect("::",2244);
 		p.mainLoop();
 	}
 
@@ -164,19 +158,22 @@ public class Client {
 	protected void sendCardsToBePlayed(){
 		int choice = -1;
 		
-		if (choice == 99) {
-			send(Optcodes.ClientEndTurn);
-		} else if (choice == 11){
-			send(Optcodes.ClientExchange);
-		}
-		
 		do {
 			choice = scan.nextInt();
-			if (choice != 11 && choice != 99 && (choice < 1 || choice > theBoard.hand.size())) {
+			if (choice != 66 && choice != 99 && (choice < 1 || choice > theBoard.hand.size())) {
 				print("Choose a number corresponding to a card in your hand");
 			}
 			else break;
 		} while (true);
+		
+		if (choice == 99) {
+			send(Optcodes.ClientExchange);
+		} else if (choice == 66) {
+			send(Optcodes.ClientEndTurn);
+		} else {
+			send(choice-1);
+		}
+
 	}
 	
 	/**
@@ -194,15 +191,22 @@ public class Client {
 		}
 		else {
 			theBoard = btmp;
-						
+			//if (theBoard.currColour != null) print("The tournament colour is " + theBoard.currColour.name() + ".\n");
+			
 			print("The board state: \n");
 			for (int i=theBoard.players.size()-1; i>=0; i--) {
-				print("Board of player ID " +theBoard.players.get(i));
+				print("Board of player ID " +theBoard.players.get(i));// +". Current points: " + theBoard.points.get(i));
 				List<Card> l = theBoard.revealed.get(i);
+				//List<Card> al = theBoard.actionBoards.get(i);
 				for(Card c: l){
 					System.out.print(c.getCardName() + " - ");
 					System.out.println("");
 				}
+				/*if (al.size() > 0) for (Card c: al) {
+					System.out.print("Action Cards affecting board: ");
+					System.out.print(c.getCardName() + " - ");
+				}*/
+				
 			}
 			System.out.println("");
 			
@@ -214,6 +218,56 @@ public class Client {
 			System.out.println("");
 		}
 	}		
+/*	
+	/**
+	 * Handler for optcode ClientWinTokenChoice
+	 * if the last tournament was purple then gets input for token choice from client.
+	 *
+	protected void handleTokenChoice(){
+		int choice = -1;
+
+		print("Choose the colour of the token you want");
+		print("{1) - Purple");
+		print("{2) - Green");
+		print("{3) - Red");
+		print("{4) - Blue");
+		print("{5) - Yellow");
+
+		while (choice == -1) {
+			choice = scan.nextInt();
+			if (choice < 1 || choice > 5){
+				print("Please choose a number between 1 and 5");
+				choice = -1;
+			} 
+		}
+
+		send(choice);
+	}
+	
+	/**
+	 * Handler for optcode ClientGetColourChoice.
+	 * Gets the player input for tournament colour
+	 *
+	protected void handleGetTournamentColour(){
+		int choice = -1;
+
+		System.out.println("Choose the color of the tournement");
+		System.out.println("{1) - Purple");
+		System.out.println("{2) - Green");
+		System.out.println("{3) - Red");
+		System.out.println("{4) - Blue");
+		System.out.println("{5) - Yellow");
+
+		while (choice == -1) {
+			choice = scan.nextInt();
+			if (choice < 1 || choice > 5){
+				System.out.println("Please choose a number between 1 and 5");
+				choice = -1;
+			} 
+		}
+
+		send(choice);
+	}*/
 
 	/**
 	 * Gets an object from the client
@@ -249,7 +303,7 @@ public class Client {
 	 * Convenience function to avoid typing system.out.println
 	 * @param s String to be printed
 	 */
-	public static void print(String s){
+	protected void print(String s){
 		System.out.println(s);
 	}
 	

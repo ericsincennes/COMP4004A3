@@ -70,7 +70,7 @@ public class Server{
 			}
 
 			print(getTimestamp() +": Expected number of clients connected. Starting Game");
-			rules.initGame();
+			rules.initFGame();
 			for(PlayerThread p : threads){
 				p.start();
 			}
@@ -155,6 +155,7 @@ public class Server{
 
 				if (rules.getPlayerList().get(0).getID() != threadID) {
 					try {
+						//updateClientBoardState();
 						send(Optcodes.ClientNotActiveTurn);
 						List<Object> event = eventQueue.poll(200, TimeUnit.MILLISECONDS);
 						if (event != null) {
@@ -171,44 +172,40 @@ public class Server{
 				}
 
 				if (rules.isRunning()) {
+					//Start client turn and draw a card
+					if (!rules.startTurn(threadID)) {
+						continue;
+					}
 					send(Optcodes.ClientActiveTurn);
-					/*sendBoardState();
-					//Is the tournament running AND not first turn in tournament
-					if (!rules.isColourChosen()) {
-						//choose colour
-						if (rules.canStartTournament(threadID)) {
-							CardColour c;
-							c = GetTournamentColourFromClient();
-							log.logmsg("Thread " + threadID + ": got tourney colour " + c + ".");
-							while(!rules.initializeTournamentColour(threadID, c)) {
-								//send some message about bad colour input
-								c = GetTournamentColourFromClient();
-							}	
 
-						} else {
-							log.logmsg("Thread " + threadID + ": failed to start a tournament.");
-							List<Object> eventmsg = new ArrayList<Object>(2);
-							eventmsg.add(Long.valueOf(threadID));
-							eventmsg.add("failstart");
-							eventmsg.add(rules.getPlayerById(threadID).getHand().getHand());
-							send(Optcodes.ClientFailStartTournament);
-							sendEvent(eventmsg);
-							rules.failInitTournamentColour();
-							continue;
-						}
-					}*/
 					//Send updated hand to client
 					sendBoardState();
 
 					//get what cards the client wants to play
-					int cardIndex, eventIndex = -1;
+					int cardIndex = -1;
 					
 					while(true){
 						//while not end turn optcode
-						eventIndex = getCardsToBePlayed();
-						print("Type 11 to exchange cards, type 99 end your turn.");
-						//print("Choose any number of cards to exchange by their position (1-5)");
-						if(eventIndex == -2) { 
+						cardIndex = getCardsToBePlayed();
+						/*
+						if(cardIndex == -2){ 
+							//Client withdrawing
+							log.logmsg("Thread " + threadID + ": withdrawn.");
+							if (rules.withdrawPlayer(threadID)) {
+								CardColour c = null;
+								do {
+									c = getTokenChoice(false);
+								} while (!rules.getPlayerById(threadID).removeToken(c)); //may need validation
+							}
+							List<Object> eventmsg = new ArrayList<Object>(2);
+							eventmsg.add(Long.valueOf(threadID));
+							eventmsg.add("withdraw");
+							sendEvent(eventmsg);
+							//when its winner's turn, they'll get a choice of token when their loop hits code
+							long winner = rules.withdrawCleanup(threadID);
+							break;
+						} else*/
+						if(cardIndex == -3) { 
 							//end turn optcode received
 							if (rules.endTurn(threadID)) {
 								log.logmsg("Thread " + threadID + ": ended turn.");
@@ -224,37 +221,109 @@ public class Server{
 								continue;
 							}
 							
-						} else if(eventIndex == -1){
+						} else if(cardIndex == -1){
 							log.logmsg("Thread " + threadID + ": invalid card.");
 							send(Optcodes.InvalidCard);
-						} else if(eventIndex == -3) {
-							print("Choose any number of cards to exchange by their position (1-5), type 99 to finish exchanging and end turn.");
-							while(true) {
-								cardIndex = getCardsToBePlayed();
-								if (cardIndex == -1) {
-									log.logmsg("Thread " + threadID + ": invalid card.");
-									send(Optcodes.InvalidCard);
-								} else if (cardIndex == -2){
-									rules.exchange(threadID);
-									sendBoardState();
-									eventIndex = -2;
-									break;
-								} else {
-									Card cardChosen = rules.getPlayerById(threadID).getHand().getCardbyIndex(cardIndex);
-									log.logmsg("Thread " + threadID + ": exchanging card " + cardIndex + ": " +	cardChosen.getCardName());
-									if (rules.exchangeCard(cardIndex, threadID)){
-										log.logmsg("Thread " + threadID + ": successfully exchanged card " + cardIndex + ": " + cardChosen.getCardName());
-									} else {
-										send(Optcodes.InvalidCard);
-										log.logmsg("Thread " + threadID + ": invalid card " + cardIndex + ": " + cardChosen.getCardName());
-									}
+						}
+						else {
+							Card cardChosen = rules.getPlayerById(threadID).getHand().getCardbyIndex(cardIndex);
+							log.logmsg("Thread " + threadID + ": attempting to play card " + cardIndex + ": " + cardChosen.getCardName());
+							/*
+							if(cardChosen.getCardType() == CardType.Action){
+								List<Object> targets = null;
+								Object o = get();
+								if (o instanceof List<?>) {
+									targets = (List<Object>) o;
 								}
-							}
-						} 
-					}
-					sendBoardState();
-				}
+								if (targets == null) {
+									send(Optcodes.InvalidCard);
+									log.logmsg("Thread " + threadID + ": Invalid targets for " + cardChosen.getCardName());
+									sendBoardState();
+									continue;
+								}
 								
+								String result = rules.validateActionCard(cardIndex, rules.getPlayerById(threadID), targets);
+								if (result.length()!=0) { //valid play
+									log.logmsg(threadID + " is playing an actioncard: " 
+										+ rules.getPlayerById(threadID).getHand().getCardbyIndex(cardIndex).getCardName() + ".");
+									
+									//get info for Adapt
+									if (cardChosen.getCardName().equals("Adapt")) { 
+										HashMap<Long,List<Integer>> adaptTargets = new HashMap<Long,List<Integer>>();
+										
+										while (!rules.validateAdaptTargets(adaptTargets)) {
+											List<Object> adaptevent = new ArrayList<Object>();
+											adaptevent.add(Long.valueOf(threadID));
+											adaptevent.add("Adapt");
+											sendEvent(adaptevent);
+											send(Optcodes.ClientGetAdapt);
+											List<Integer> chosen = (List<Integer>) get();
+											adaptTargets.put(threadID, chosen);
+											//TODO get chosen lists from other threads
+											for (int i=0; i<numplayers-1;) {
+												Object adaptTarget = handleEvent(eventQueue.poll());
+												if (adaptTarget instanceof HashMap<?,?>) {
+													adaptTargets.putAll((HashMap<Long,List<Integer>>) adaptTarget);
+													i++;
+												}
+											}
+										}
+										targets.add(adaptTargets);
+									}
+									
+									List<Object> eventmsg = new ArrayList<Object>();
+									eventmsg.add(Long.valueOf(threadID));
+									eventmsg.add("actioncard");
+									eventmsg.add(result);
+									sendEvent(eventmsg);
+									
+									//ivanhoe stuff
+									if (rules.canBeIvanhoed(threadID)) { //wait 7 seconds for invanhoe response if applicable
+										log.logmsg(threadID + " waiting on Ivanhoe response.");
+										List<Object> event = null;
+										try {
+											sleep(200);
+											event = eventQueue.take();
+										} catch (InterruptedException e) { e.printStackTrace(); }
+										Boolean ivanhoed = (Boolean) handleEvent(event);
+										if (ivanhoed != null && ivanhoed) { 
+											send(Optcodes.Ivanhoe);
+											rules.getDeck().addToDiscard(rules.getPlayerById(threadID).playActionCard(cardIndex));
+											sendBoardState();
+											continue;
+										}
+									}
+									else {}
+									
+									rules.actionHandler(cardIndex, rules.getPlayerById(threadID), targets);
+									send(Optcodes.SuccessfulCardPlay);
+									log.logmsg("Thread " + threadID + ": successfully played action card " + cardIndex + ": " + 
+											cardChosen.getCardName());
+								}
+								else {
+									send(Optcodes.InvalidCard);
+									log.logmsg("Thread " + threadID + ": invalid play action card " + cardIndex + ": " + 
+											cardChosen.getCardName());
+								}
+							}*/
+							/*if (cardChosen.getCardType() == CardType.Ivanhoe) {
+								send(Optcodes.InvalidCard);
+							}*/
+							if (rules.exchangeCard(cardIndex, threadID)) {
+								send(Optcodes.SuccessfulCardPlay);
+								log.logmsg("Thread " + threadID + ": successfully exchanged card " + cardIndex + ": " + 
+										cardChosen.getCardName());
+							}
+							else {
+								send(Optcodes.InvalidCard);
+								log.logmsg("Thread " + threadID + ": invalid play value card " + cardIndex + ": " + 
+										cardChosen.getCardName());
+							}
+						}
+						sendBoardState();
+					}
+				}
+				
 				else {
 					//if tournament is not running
 					if (rules.getPlayerById(threadID).getPlaying()) { //then you are winner of previous tourney
@@ -262,8 +331,22 @@ public class Server{
 						eventmsg.add(Long.valueOf(threadID));
 						eventmsg.add("tournamentover");
 						sendEvent(eventmsg);
+						/*if(rules.getTournamentColour() == CardColour.Purple){
+							//if purple tournament give token of choice
+							CardColour c = null;
+							print("Getting token from player.");
+							do {			
+								c = getTokenChoice(true);
+								print("Got token of colour " + c + " from thread " + threadID + ".");
+							} while(!rules.giveToken(threadID, c));
+						} else {
+							//give current tournament colour token
+							rules.giveToken(threadID, rules.getTournamentColour());
+						}*/
+
 					}
 					rules.roundCleanup();
+					rules.initGame();
 				}
 			}
 		}
@@ -284,10 +367,11 @@ public class Server{
 			send(Optcodes.ClientGetCardsToBePlayed);
 			int index = (int) get();
 			String cardname = "";
-
-			if (index == Optcodes.ClientEndTurn){ //client calls end turn
+			/*
+			if(isClientWithdrawing(index)){ //Client withdraws
 				return -2;
-			} else if (index == Optcodes.ClientExchange) {
+			}*/
+			if (index == Optcodes.ClientEndTurn){ //client calls end turn
 				return -3;
 			}
 
@@ -330,9 +414,22 @@ public class Server{
 			}
 			if (!(event.get(1) instanceof String)) { return null; }
 			switch ((String) event.get(1)) {
+			case "tournamentover":
+				send(Optcodes.LoseTournament);
+				send(((Long) event.get(0)).toString());
+				break;
 			case "gameover":
 				send(Optcodes.GameOver);
 				send(((Long) event.get(0)).toString());
+				break;
+			case "failstart":
+				send(Optcodes.OppFailStartTournament);
+				send(((Long) event.get(0)).toString()); //player id who failed
+				send((List<Card>)event.get(2)); //hand
+				break;
+			case "withdraw":
+				send(Optcodes.OppWithdraw);
+				send(event.get(0));
 				break;
 			case "endturn":
 				send(Optcodes.OppEndTurn);

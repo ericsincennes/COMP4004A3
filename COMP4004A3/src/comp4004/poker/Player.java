@@ -9,6 +9,7 @@ public class Player {
 	private PointsBoard display;
 	private long id;
 	private boolean isPlaying = false;
+	private boolean turnOver = false;
 	private int handStrength = 0;
 	public boolean hasPlayedToBoard = false;
 	
@@ -26,6 +27,10 @@ public class Player {
 		return isPlaying;
 	}
 	
+	public boolean getTurnOver() {
+		return turnOver;
+	}
+	
 	public void removeCard(String s) {
 		hand.remove(s);
 	}
@@ -34,22 +39,16 @@ public class Player {
 		isPlaying = s;
 	}
 	
+	public void setTurnOver(boolean t) {
+		turnOver = t;
+	}
+	
 	/**
 	 * Draws a card  and adds it to hand
 	 * @param c Card
 	 */
 	public void addCard(Card c){
 		hand.add(c);
-	}
-	
-	/**
-	 * Adds a Color card to the display
-	 * @param position of card in hand
-	 */
-	public void exchangeCards(List<Card> cards){
-		for (Card c : cards) {
-			getHand().remove(c.getCardName());
-		}
 	}
 	
 	public int getHandStrength() {

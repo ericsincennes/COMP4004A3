@@ -38,11 +38,12 @@ public final class BoardState implements Serializable{
 			return false;
 		}
 		BoardState other = (BoardState) otherobj;
-		boolean a,b,c;
+		boolean a,b,c,d;
 		a = this.owner == other.owner;
 		b = this.players.equals(other.players);
 		c = this.hand.equals(other.hand);
-		return a && b && c;
+		d = this.revealed.equals(other.revealed);
+		return a && b && c && d;
 	}
 	
 }

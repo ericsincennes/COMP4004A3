@@ -15,7 +15,7 @@ import comp4004.poker.Hand.Strength;
 public class RulesEngine {
 	private HashMap<Long, Player> players;
 	private List<Player> playersList;
-	private List<Card> exchangeList;
+	private List<Card> exchangeList = new ArrayList<Card>();
 	private int numPlayers = 0, expectedPlayers, expectedai;
 	private Deck deck, discard;
 
@@ -83,7 +83,7 @@ public class RulesEngine {
 	 * Does startup for the first tournament
 	 * @return player number of the first tournament starter
 	 */
-	public synchronized long initGame(){
+	public synchronized long initFGame(){
 		Collections.shuffle(playersList);
 		//notifyAll();
 		for(Player p : playersList){
@@ -92,6 +92,15 @@ public class RulesEngine {
 			}
 		}
 		return playersList.get(0).getID();
+	}
+	
+	public void initGame(){
+		if (isRunning()) {
+			return;
+		}
+		for(Player p : playersList){
+			p.setPlaying(true);
+		}
 	}
 
 
@@ -106,7 +115,7 @@ public class RulesEngine {
 		Player p = getPlayerById(id);
 		if(p.getPlaying()){
 			p.hasPlayedToBoard = false;
-			p.addCard(deck.draw());
+			//p.addCard(deck.draw());
 			return true;
 		} else {
 			Collections.rotate(playersList, -1);
@@ -143,16 +152,17 @@ public class RulesEngine {
 			return false; 
 		}
 		exchangeList.add(c);
+		p.getHand().removeByIndex(posinhand);
 		return true;
 	}
 	
 	public void exchange(long id){
 		Player p = getPlayerById(id);
-		p.exchangeCards(exchangeList);
 		for (Card c : exchangeList){
 			Card reveal = drawRevCard(id);
 			p.getDisplay().addCard(reveal);
 		}
+		exchangeList.clear();
 	}
 	
 	public void determineHandStrength(long id) {
@@ -320,6 +330,8 @@ public class RulesEngine {
 	 */
 	public boolean endTurn(long id){
 		players.get(id).hasPlayedToBoard = false;
+		exchange(id);
+		players.get(id).setTurnOver(true);
 		Collections.rotate(playersList, -1);
 		return true;
 	}
@@ -344,7 +356,11 @@ public class RulesEngine {
 		Player winner = null;
 		for (Player p : playersList) {
 			if (numPlayers < 2) return p;
-			determineHandStrength(p.getID());
+			if (!p.getTurnOver()) {
+				return null;
+			} else {
+				determineHandStrength(p.getID());
+			}
 		}
 		
 		for (Player p : playersList) {
