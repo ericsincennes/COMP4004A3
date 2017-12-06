@@ -18,7 +18,6 @@ public class RulesEngine {
 	private List<Card> exchangeList;
 	private int numPlayers = 0, expectedPlayers, expectedai;
 	private Deck deck, discard;
-	private int highestScore = 0;
 
 	public RulesEngine(int i, int j){
 		expectedPlayers = i;
@@ -38,15 +37,6 @@ public class RulesEngine {
 	public synchronized List<Player> getPlayerList(){
 		return playersList;
 	}
-	
-	/**
-	 * Returns the highest score recorded by the rules engine for the current tournament
-	 * @return int
-	 */
-	public int getHighestScore() {
-		return highestScore;
-	}
-	
 	
 	/**
 	 * Registers a player with the Rules engine
@@ -93,7 +83,7 @@ public class RulesEngine {
 	 * Does startup for the first tournament
 	 * @return player number of the first tournament starter
 	 */
-	public synchronized long initFirstTournament(){
+	public synchronized long initGame(){
 		Collections.shuffle(playersList);
 		//notifyAll();
 		for(Player p : playersList){
@@ -104,30 +94,6 @@ public class RulesEngine {
 		return playersList.get(0).getID();
 	}
 
-
-	/**
-	 * Initializing gamestate for a tournament if no tournament is started
-	 */
-	public void initTournament(){
-		if (isRunning()) {
-			return;
-		}
-		for(Player p : playersList){
-			p.setPlaying(true);
-		}
-	}
-	
-	
-	/**
-	 * Deals a hand of 5 cards to each player
-	 */
-	public void dealHand(){ //up for being replaced by initFirstTournament
-		for(Player p : playersList){
-			for(int i =0; i < 5; i++){
-				drawHidCard(p.getID());
-			}
-		}
-	}
 
 	/**
 	 * Checks if the player can play their turn
@@ -368,7 +334,6 @@ public class RulesEngine {
 				deck.addToDiscard(c);
 			}
 		}
-		highestScore = 0;
 	}
 	
 	/**

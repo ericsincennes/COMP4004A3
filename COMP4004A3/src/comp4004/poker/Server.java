@@ -70,7 +70,7 @@ public class Server{
 			}
 
 			print(getTimestamp() +": Expected number of clients connected. Starting Game");
-			rules.initFirstTournament();
+			rules.initGame();
 			for(PlayerThread p : threads){
 				p.start();
 			}
@@ -171,10 +171,6 @@ public class Server{
 				}
 
 				if (rules.isRunning()) {
-					//Start client turn and draw a card
-					if (!rules.startTurn(threadID)) {
-						continue;
-					}
 					send(Optcodes.ClientActiveTurn);
 					/*sendBoardState();
 					//Is the tournament running AND not first turn in tournament

@@ -26,7 +26,13 @@ public class Client {
 
 	public static void main(String[] args){
 		Client p = new Client();
-		p.connect("::",2244);
+		Scanner in = new Scanner(System.in);
+		print("Enter an IP address for the game: ");
+		String ip = in.nextLine();
+		print("Enter a port for the game: ");
+		int port = in.nextInt();
+		in.close();
+		p.connect(ip,port);
 		p.mainLoop();
 	}
 
@@ -246,7 +252,7 @@ public class Client {
 	 * Convenience function to avoid typing system.out.println
 	 * @param s String to be printed
 	 */
-	protected void print(String s){
+	public static void print(String s){
 		System.out.println(s);
 	}
 	
