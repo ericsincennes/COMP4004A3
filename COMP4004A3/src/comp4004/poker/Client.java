@@ -177,9 +177,6 @@ public class Client {
 			}
 			else break;
 		} while (true);
-		
-
-
 	}
 	
 	/**

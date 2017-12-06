@@ -236,7 +236,6 @@ public class Server{
 									send(Optcodes.InvalidCard);
 								} else if (cardIndex == -2){
 									rules.exchange(threadID);
-									//rules.determineHandStrength(threadID);
 									sendBoardState();
 									eventIndex = -2;
 									break;
