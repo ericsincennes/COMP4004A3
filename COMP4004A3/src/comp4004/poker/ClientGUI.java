@@ -47,19 +47,11 @@ public class ClientGUI extends Client{
 	private JPanel actionArea;
 	private JPanel playerDisplayPanel;
 	private JPanel[] opponentPanel;
-//	private JPanel[] opponentActionPanel;
-//	private JPanel actionCardPanel;
-//	private JPanel playerActionPanel;
 	
 	private JLabel informationLabel = new JLabel();
-/*	private JLabel tournamentColourLabel = new JLabel();
-	private JLabel highestScore = new JLabel();
-	private JLabel playerScore = new JLabel();
-	private JLabel tokens = new JLabel();*/
 	
 	private JScrollPane handPane;
 	private JScrollPane displayPane;
-//	private JScrollPane actionCardPane;
 	
 	private Card selectedCard = null;
 	
@@ -93,7 +85,6 @@ public class ClientGUI extends Client{
 	 */
 	public ClientGUI() {
 		opponentPanel = new JPanel[3];
-		//opponentActionPanel = new JPanel[4];
 		//initialize();
 	}
 
@@ -141,14 +132,8 @@ public class ClientGUI extends Client{
 		actionArea.setLayout(new GridLayout(6,1));
 
 		JButton endTurnButton = new JButton("End Turn");
-		//JButton exchangeButton = new JButton("Exchange");
 		JButton playCardButton = new JButton("Exchange Card");
-/*
-		highestScore.setText("High Score: ");
-		highestScore.setVerticalAlignment(JLabel.CENTER);
 
-		playerScore.setText("Your Score: ");
-		playerScore.setVerticalAlignment(JLabel.CENTER);*/
 		
 		playCardButton.addActionListener(new ActionListener() {
 
@@ -182,26 +167,8 @@ public class ClientGUI extends Client{
 				}
 			}
 		});
-/*
-		//exchange Button Pressed
-		exchangeButton.addActionListener(new ActionListener() {
 
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(isActiveTurn){
-					//is players turn
-					send(Optcodes.ClientExchange);
-				} else {
-					//if not player's turn
-					JOptionPane.showMessageDialog(actionArea, "Cannot exchange when it is not your turn", "Exchange Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});*/
-
-		//actionArea.add(highestScore);
-		//actionArea.add(playerScore);
 		actionArea.add(endTurnButton);
-		//actionArea.add(exchangeButton);
 		actionArea.add(playCardButton);
 	}
 
@@ -247,35 +214,7 @@ public class ClientGUI extends Client{
 		
 		displaysPanel.add(playerDisplayPanel);
 	}
-/*	
-	private void initializeActionCardPanel(){
-		int numplayers = theBoard.players.size();
-		
-		//get player id's
-		Long[] playerid = new Long[numplayers];
-		playerid = theBoard.players.toArray(playerid);
-				
-		actionCardPanel = new JPanel();
-		actionCardPanel.setBackground(Color.gray);
-		actionCardPanel.setLayout(new GridLayout(0, 1));
-		
-		actionCardPane = new JScrollPane(actionCardPanel);
-		actionCardPane.setPreferredSize(new Dimension(205, 145));
-		
-		playerActionPanel = new JPanel();
-		playerActionPanel.setLayout(new FlowLayout());
-		playerActionPanel.setBorder(new TitledBorder(new LineBorder(Color.black), "Your Action Cards"));
-		
-		for(int i=0; i<numplayers-1; i++){
-			opponentActionPanel[i] = new JPanel();
-			opponentActionPanel[i].setLayout(new FlowLayout());
-			opponentActionPanel[i].setBorder(new TitledBorder(new LineBorder(Color.black), "Opponent " + playerid[i+1] +"'s Action Cards"));
-			opponentActionPanel[i].setName("Opponent " + playerid[i+1]);
-			actionCardPanel.add(opponentActionPanel[i]);
-		}
-		actionCardPanel.add(playerActionPanel);
-	}
-	*/
+
 	private void initializeInformationPanel(){
 		informationPanel = new JPanel();
 		informationPanel.setBackground(Color.orange);
@@ -398,10 +337,6 @@ public class ClientGUI extends Client{
 		displayPane.repaint();
 		displayPane.revalidate();
 	}
-	/*
-	public void handleClientExchange(){
-		JOptionPane.showMessageDialog(frmMain.getContentPane(), "You have exchange from the game", "GG", JOptionPane.INFORMATION_MESSAGE);
-	}*/
 	
 	public void handleInvalidCard(){
 		JOptionPane.showMessageDialog(frmMain.getContentPane(), "Card Cannot be played", "Card Error", JOptionPane.ERROR_MESSAGE);
@@ -488,13 +423,7 @@ public class ClientGUI extends Client{
 		
 		JOptionPane.showMessageDialog(frmMain.getContentPane(), hp, msg, JOptionPane.PLAIN_MESSAGE);
 	}
-	/*
-	public void handleOppActionCardPlayed() {
-		String message = (String) get();
-		
-		//display message of what action card has been played
-		JOptionPane.showMessageDialog(frmMain.getContentPane(), message, "Action card played", JOptionPane.PLAIN_MESSAGE);
-	}*/
+
 	
 	private void handleGameWinner(){
 		JOptionPane.showMessageDialog(frmMain.getContentPane(), "You have won the game!" , "Game Winner", JOptionPane.INFORMATION_MESSAGE);

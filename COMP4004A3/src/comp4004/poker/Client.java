@@ -120,34 +120,10 @@ public class Client {
 	 * Currently overridden by clientGUI
 	 */
 	protected void handleActiveTurn() {
-		// TODO Auto-generated method stub
+
 		isActiveTurn = true;
 		print("It is now your turn.");
-		/*
-		print("The board state: \n");
-		for (int i=theBoard.players.size()-1; i>=0; i--) {
-			print("Board of player ID " +theBoard.players.get(i) +". Current points: " + theBoard.points.get(i));
-			List<Card> l = theBoard.boards.get(i);
-			List<Card> al = theBoard.actionBoards.get(i);
-			for(Card c: l){
-				System.out.print(c.getCardName() + " - ");
-				System.out.println("");
-			}
-			if (al.size() > 0) for (Card c: al) {
-				System.out.print("Action Cards affecting board: ");
-				System.out.print(c.getCardName() + " - ");
-			}
-			
-		}
-		System.out.println("");
-		
-		print("Your hand:");
-		for(Card c: theBoard.hand){
-			System.out.print(c.getCardName() + " - ");
-			
-		}
-		System.out.println("");
-		*/
+
 	}
 
 	/**
@@ -191,21 +167,17 @@ public class Client {
 		}
 		else {
 			theBoard = btmp;
-			//if (theBoard.currColour != null) print("The tournament colour is " + theBoard.currColour.name() + ".\n");
-			
+						
 			print("The board state: \n");
 			for (int i=theBoard.players.size()-1; i>=0; i--) {
-				print("Board of player ID " +theBoard.players.get(i));// +". Current points: " + theBoard.points.get(i));
+				print("Board of player ID " +theBoard.players.get(i));
 				List<Card> l = theBoard.revealed.get(i);
-				//List<Card> al = theBoard.actionBoards.get(i);
+	
 				for(Card c: l){
 					System.out.print(c.getCardName() + " - ");
 					System.out.println("");
 				}
-				/*if (al.size() > 0) for (Card c: al) {
-					System.out.print("Action Cards affecting board: ");
-					System.out.print(c.getCardName() + " - ");
-				}*/
+	
 				
 			}
 			System.out.println("");
@@ -218,56 +190,7 @@ public class Client {
 			System.out.println("");
 		}
 	}		
-/*	
-	/**
-	 * Handler for optcode ClientWinTokenChoice
-	 * if the last tournament was purple then gets input for token choice from client.
-	 *
-	protected void handleTokenChoice(){
-		int choice = -1;
 
-		print("Choose the colour of the token you want");
-		print("{1) - Purple");
-		print("{2) - Green");
-		print("{3) - Red");
-		print("{4) - Blue");
-		print("{5) - Yellow");
-
-		while (choice == -1) {
-			choice = scan.nextInt();
-			if (choice < 1 || choice > 5){
-				print("Please choose a number between 1 and 5");
-				choice = -1;
-			} 
-		}
-
-		send(choice);
-	}
-	
-	/**
-	 * Handler for optcode ClientGetColourChoice.
-	 * Gets the player input for tournament colour
-	 *
-	protected void handleGetTournamentColour(){
-		int choice = -1;
-
-		System.out.println("Choose the color of the tournement");
-		System.out.println("{1) - Purple");
-		System.out.println("{2) - Green");
-		System.out.println("{3) - Red");
-		System.out.println("{4) - Blue");
-		System.out.println("{5) - Yellow");
-
-		while (choice == -1) {
-			choice = scan.nextInt();
-			if (choice < 1 || choice > 5){
-				System.out.println("Please choose a number between 1 and 5");
-				choice = -1;
-			} 
-		}
-
-		send(choice);
-	}*/
 
 	/**
 	 * Gets an object from the client

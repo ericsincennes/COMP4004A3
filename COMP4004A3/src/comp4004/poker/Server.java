@@ -187,24 +187,7 @@ public class Server{
 					while(true){
 						//while not end turn optcode
 						cardIndex = getCardsToBePlayed();
-						/*
-						if(cardIndex == -2){ 
-							//Client withdrawing
-							log.logmsg("Thread " + threadID + ": withdrawn.");
-							if (rules.withdrawPlayer(threadID)) {
-								CardColour c = null;
-								do {
-									c = getTokenChoice(false);
-								} while (!rules.getPlayerById(threadID).removeToken(c)); //may need validation
-							}
-							List<Object> eventmsg = new ArrayList<Object>(2);
-							eventmsg.add(Long.valueOf(threadID));
-							eventmsg.add("withdraw");
-							sendEvent(eventmsg);
-							//when its winner's turn, they'll get a choice of token when their loop hits code
-							long winner = rules.withdrawCleanup(threadID);
-							break;
-						} else*/
+					
 						if(cardIndex == -3) { 
 							//end turn optcode received
 							if (rules.endTurn(threadID)) {
@@ -228,87 +211,7 @@ public class Server{
 						else {
 							Card cardChosen = rules.getPlayerById(threadID).getHand().getCardbyIndex(cardIndex);
 							log.logmsg("Thread " + threadID + ": attempting to play card " + cardIndex + ": " + cardChosen.getCardName());
-							/*
-							if(cardChosen.getCardType() == CardType.Action){
-								List<Object> targets = null;
-								Object o = get();
-								if (o instanceof List<?>) {
-									targets = (List<Object>) o;
-								}
-								if (targets == null) {
-									send(Optcodes.InvalidCard);
-									log.logmsg("Thread " + threadID + ": Invalid targets for " + cardChosen.getCardName());
-									sendBoardState();
-									continue;
-								}
-								
-								String result = rules.validateActionCard(cardIndex, rules.getPlayerById(threadID), targets);
-								if (result.length()!=0) { //valid play
-									log.logmsg(threadID + " is playing an actioncard: " 
-										+ rules.getPlayerById(threadID).getHand().getCardbyIndex(cardIndex).getCardName() + ".");
-									
-									//get info for Adapt
-									if (cardChosen.getCardName().equals("Adapt")) { 
-										HashMap<Long,List<Integer>> adaptTargets = new HashMap<Long,List<Integer>>();
-										
-										while (!rules.validateAdaptTargets(adaptTargets)) {
-											List<Object> adaptevent = new ArrayList<Object>();
-											adaptevent.add(Long.valueOf(threadID));
-											adaptevent.add("Adapt");
-											sendEvent(adaptevent);
-											send(Optcodes.ClientGetAdapt);
-											List<Integer> chosen = (List<Integer>) get();
-											adaptTargets.put(threadID, chosen);
-											//TODO get chosen lists from other threads
-											for (int i=0; i<numplayers-1;) {
-												Object adaptTarget = handleEvent(eventQueue.poll());
-												if (adaptTarget instanceof HashMap<?,?>) {
-													adaptTargets.putAll((HashMap<Long,List<Integer>>) adaptTarget);
-													i++;
-												}
-											}
-										}
-										targets.add(adaptTargets);
-									}
-									
-									List<Object> eventmsg = new ArrayList<Object>();
-									eventmsg.add(Long.valueOf(threadID));
-									eventmsg.add("actioncard");
-									eventmsg.add(result);
-									sendEvent(eventmsg);
-									
-									//ivanhoe stuff
-									if (rules.canBeIvanhoed(threadID)) { //wait 7 seconds for invanhoe response if applicable
-										log.logmsg(threadID + " waiting on Ivanhoe response.");
-										List<Object> event = null;
-										try {
-											sleep(200);
-											event = eventQueue.take();
-										} catch (InterruptedException e) { e.printStackTrace(); }
-										Boolean ivanhoed = (Boolean) handleEvent(event);
-										if (ivanhoed != null && ivanhoed) { 
-											send(Optcodes.Ivanhoe);
-											rules.getDeck().addToDiscard(rules.getPlayerById(threadID).playActionCard(cardIndex));
-											sendBoardState();
-											continue;
-										}
-									}
-									else {}
-									
-									rules.actionHandler(cardIndex, rules.getPlayerById(threadID), targets);
-									send(Optcodes.SuccessfulCardPlay);
-									log.logmsg("Thread " + threadID + ": successfully played action card " + cardIndex + ": " + 
-											cardChosen.getCardName());
-								}
-								else {
-									send(Optcodes.InvalidCard);
-									log.logmsg("Thread " + threadID + ": invalid play action card " + cardIndex + ": " + 
-											cardChosen.getCardName());
-								}
-							}*/
-							/*if (cardChosen.getCardType() == CardType.Ivanhoe) {
-								send(Optcodes.InvalidCard);
-							}*/
+							
 							if (rules.exchangeCard(cardIndex, threadID)) {
 								send(Optcodes.SuccessfulCardPlay);
 								log.logmsg("Thread " + threadID + ": successfully exchanged card " + cardIndex + ": " + 
@@ -331,18 +234,6 @@ public class Server{
 						eventmsg.add(Long.valueOf(threadID));
 						eventmsg.add("tournamentover");
 						sendEvent(eventmsg);
-						/*if(rules.getTournamentColour() == CardColour.Purple){
-							//if purple tournament give token of choice
-							CardColour c = null;
-							print("Getting token from player.");
-							do {			
-								c = getTokenChoice(true);
-								print("Got token of colour " + c + " from thread " + threadID + ".");
-							} while(!rules.giveToken(threadID, c));
-						} else {
-							//give current tournament colour token
-							rules.giveToken(threadID, rules.getTournamentColour());
-						}*/
 
 					}
 					rules.roundCleanup();
@@ -367,10 +258,7 @@ public class Server{
 			send(Optcodes.ClientGetCardsToBePlayed);
 			int index = (int) get();
 			String cardname = "";
-			/*
-			if(isClientWithdrawing(index)){ //Client withdraws
-				return -2;
-			}*/
+
 			if (index == Optcodes.ClientEndTurn){ //client calls end turn
 				return -3;
 			}
