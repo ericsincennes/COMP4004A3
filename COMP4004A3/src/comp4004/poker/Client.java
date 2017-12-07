@@ -21,6 +21,7 @@ public class Client {
 	protected int playerNum = -1;
 	protected BoardState theBoard;
 	protected boolean isActiveTurn;
+	protected boolean hasExchanged = false;
 	protected Scanner scan = new Scanner(System.in);
 	protected String colour;
 
@@ -93,6 +94,7 @@ public class Client {
 				print("Card was played successfully");
 				break;
 			case Optcodes.ClientExchange:
+				hasExchanged = true;
 				break;
 			case Optcodes.ClientActiveTurn:
 				handleActiveTurn();

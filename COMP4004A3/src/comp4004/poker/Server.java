@@ -203,6 +203,11 @@ public class Server{
 								send(Optcodes.ClientActiveTurn);
 								continue;
 							}
+						} else if (cardIndex == -2) {
+							rules.exchange(threadID);
+							log.logmsg("Thread " + threadID + ": exchanged cards.");
+							send(Optcodes.ClientExchange);
+							
 							
 						} else if(cardIndex == -1){
 							log.logmsg("Thread " + threadID + ": invalid card.");
@@ -212,9 +217,9 @@ public class Server{
 							Card cardChosen = rules.getPlayerById(threadID).getHand().getCardbyIndex(cardIndex);
 							log.logmsg("Thread " + threadID + ": attempting to play card " + cardIndex + ": " + cardChosen.getCardName());
 							
-							if (rules.exchangeCard(cardIndex, threadID)) {
+							if (rules.discardCard(cardIndex, threadID)) {
 								send(Optcodes.SuccessfulCardPlay);
-								log.logmsg("Thread " + threadID + ": successfully exchanged card " + cardIndex + ": " + 
+								log.logmsg("Thread " + threadID + ": successfully discarded card " + cardIndex + ": " + 
 										cardChosen.getCardName());
 							}
 							else {
@@ -261,6 +266,8 @@ public class Server{
 
 			if (index == Optcodes.ClientEndTurn){ //client calls end turn
 				return -3;
+			} else if (index == Optcodes.ClientExchange) {
+				return -2;
 			}
 
 			if(index < 0 || index > rules.getPlayerById(threadID).getHandSize()){

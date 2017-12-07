@@ -137,7 +137,7 @@ public class RulesEngine {
 		return c;
 	}
 	
-	public synchronized boolean exchangeCard(int posinhand, Long id){
+	public synchronized boolean discardCard(int posinhand, Long id){
 		Player p = players.get(id);
 		Card c;
 		//Check if the card is in the players hand

@@ -132,10 +132,11 @@ public class ClientGUI extends Client{
 		actionArea.setLayout(new GridLayout(6,1));
 
 		JButton endTurnButton = new JButton("End Turn");
-		JButton playCardButton = new JButton("Exchange Card");
+		JButton exchangeButton = new JButton("Exchange Cards");
+		JButton discardButton = new JButton("Discard Card");
 
-		
-		playCardButton.addActionListener(new ActionListener() {
+		//Discard Button pressed
+		discardButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {			
@@ -144,11 +145,11 @@ public class ClientGUI extends Client{
 						sendCardsToBePlayed();
 					} else {
 						//no card selected
-						JOptionPane.showMessageDialog(actionArea, "Select a card to exchange", "Cannot exchange nothing", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(actionArea, "Select a card to discard", "Cannot discard nothing", JOptionPane.ERROR_MESSAGE);
 						}
 				} else {
 					//not players turn
-					JOptionPane.showMessageDialog(actionArea, "Cannot exchange card when it is not your turn", "Exchange card error", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(actionArea, "Cannot discard card when it is not your turn", "Discard error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -167,9 +168,29 @@ public class ClientGUI extends Client{
 				}
 			}
 		});
+		
+		//Exchange Button Pressed
+		exchangeButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(isActiveTurn){
+					//is players turn
+					if (!hasExchanged) {
+						send(Optcodes.ClientExchange);
+					} else {
+						JOptionPane.showMessageDialog(actionArea, "Can only exchange once.", "Exchange Error", JOptionPane.ERROR_MESSAGE);
+					}
+				} else {
+					//if not player's turn
+					JOptionPane.showMessageDialog(actionArea, "Cannot exchange when it is not your turn", "Exchange Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 
 		actionArea.add(endTurnButton);
-		actionArea.add(playCardButton);
+		actionArea.add(exchangeButton);
+		actionArea.add(discardButton);
 	}
 
 	/**
