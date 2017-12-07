@@ -142,6 +142,7 @@ public class Server{
 			log.logmsg("Thread " + threadID + " starting up.");
 			while(isRunning){
 				if (rules.gameWinner() != null) {
+					System.out.println("Hi");
 					if (rules.gameWinner().getID() == threadID) {
 						//send winner msg to client
 						send(Optcodes.GameWinner);
@@ -150,7 +151,7 @@ public class Server{
 						send(Optcodes.GameOver);
 						send(Long.valueOf(rules.gameWinner().getID()));
 					}
-					break; //or possibly ask to start again?
+					break;
 				}
 
 				if (rules.getPlayerList().get(0).getID() != threadID) {
@@ -204,11 +205,10 @@ public class Server{
 								continue;
 							}
 						} else if (cardIndex == -2) {
-							rules.exchange(threadID);
+							rules.exchangeCard(threadID);
 							log.logmsg("Thread " + threadID + ": exchanged cards.");
 							send(Optcodes.ClientExchange);
-							
-							
+													
 						} else if(cardIndex == -1){
 							log.logmsg("Thread " + threadID + ": invalid card.");
 							send(Optcodes.InvalidCard);
@@ -237,7 +237,7 @@ public class Server{
 					if (rules.getPlayerById(threadID).getPlaying()) { //then you are winner of previous tourney
 						List<Object> eventmsg = new ArrayList<Object>(2);
 						eventmsg.add(Long.valueOf(threadID));
-						eventmsg.add("tournamentover");
+						eventmsg.add("gameover");
 						sendEvent(eventmsg);
 
 					}
@@ -309,22 +309,9 @@ public class Server{
 			}
 			if (!(event.get(1) instanceof String)) { return null; }
 			switch ((String) event.get(1)) {
-			case "tournamentover":
-				send(Optcodes.LoseTournament);
-				send(((Long) event.get(0)).toString());
-				break;
 			case "gameover":
 				send(Optcodes.GameOver);
 				send(((Long) event.get(0)).toString());
-				break;
-			case "failstart":
-				send(Optcodes.OppFailStartTournament);
-				send(((Long) event.get(0)).toString()); //player id who failed
-				send((List<Card>)event.get(2)); //hand
-				break;
-			case "withdraw":
-				send(Optcodes.OppWithdraw);
-				send(event.get(0));
 				break;
 			case "endturn":
 				send(Optcodes.OppEndTurn);

@@ -156,7 +156,7 @@ public class RulesEngine {
 		return true;
 	}
 	
-	public void exchange(long id){
+	public void exchangeCard(long id){
 		Player p = getPlayerById(id);
 		for (Card c : exchangeList){
 			Card reveal = drawRevCard(id);
@@ -165,9 +165,9 @@ public class RulesEngine {
 		exchangeList.clear();
 	}
 	
-	public void determineHandStrength(long id) {
-		Hand hand = getPlayerById(id).getHand();
-		List<Card> h = getPlayerById(id).getHand().getHand();
+	public void determineHandStrength(Player p) {
+		Hand hand = p.getHand();
+		List<Card> h = p.getHand().getHand();
 		Collections.sort(h);
 		if (isFOK(h, hand)) {
 			hand.setStrength(Strength.FourOK);
@@ -179,18 +179,19 @@ public class RulesEngine {
 			hand.setStrength(Strength.TwoPair);
 		} else if (isOP(h, hand)) {
 			hand.setStrength(Strength.OnePair);
-		} else if (isStr(h, hand)) {
-			hand.setStrength(Strength.Straight);
 		} else if (isRoyal(h, hand)) {
 			hand.setStrength(Strength.Royal);
 		} else if (isStrFlu(h, hand)) {
 			hand.setStrength(Strength.StrFlush);
+		} else if (isStr(h, hand)) {
+			hand.setStrength(Strength.Straight);
 		} else if (isFlush(h, hand)) {
 			hand.setStrength(Strength.Flush);
 		} else {
 			hand.setStrength(Strength.HighCard);
 			hand.setTieBreaker(h.get(4));
 		}
+		System.out.println(hand.getStrength());
 	}
 	
 	public boolean isFOK(List<Card> h, Hand hand) {
@@ -330,7 +331,7 @@ public class RulesEngine {
 	 */
 	public boolean endTurn(long id){
 		players.get(id).hasPlayedToBoard = false;
-		exchange(id);
+		exchangeCard(id);
 		players.get(id).setTurnOver(true);
 		Collections.rotate(playersList, -1);
 		return true;
@@ -359,13 +360,14 @@ public class RulesEngine {
 			if (!p.getTurnOver()) {
 				return null;
 			} else {
-				determineHandStrength(p.getID());
+				determineHandStrength(p);
 			}
 		}
-		
+		System.out.println("Hey");
 		for (Player p : playersList) {
 			if (winner == null) {
 				winner = p;
+				System.out.println(winner);
 			} else {
 				if (winner.getHand().getStrength().ordinal() > p.getHand().getStrength().ordinal()) {
 					winner = p;

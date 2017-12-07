@@ -378,15 +378,14 @@ public class ClientGUI extends Client{
 		send(theBoard.hand.indexOf(selectedCard));
 	}
 	
-	
-	public void handleLoseTournament() {
-		String winner = (String) get();
-		JOptionPane.showMessageDialog(frmMain.getContentPane(), "The winner was Player: " + winner, "Tournament Winner", JOptionPane.INFORMATION_MESSAGE);
-	}
-	
 	public void handleLoseGame() {
-		String winner = (String) get();
+		Long winner = (Long) get();
 		JOptionPane.showMessageDialog(frmMain.getContentPane(), "The winner was Player: " + winner + "\nYou have Lost. \n", "Game Winner", JOptionPane.WARNING_MESSAGE);
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override
@@ -422,32 +421,15 @@ public class ClientGUI extends Client{
 		frmMain.revalidate();
 		frmMain.repaint();
 	}
-	private void handleClientFailStartTournament(){
-		String playerID = (String) get();
-		List<Card> hand = (List<Card>) get();
-		
-		String msg = "Player "+ playerID + " cannot start a tournament";
-		JPanel hp = new JPanel();
-		hp.setLayout(new FlowLayout());
-		
-		for(Card x : hand){
-			BufferedImage img = null;
-			try{
-				img = ImageIO.read(new File(ImageDirectory + x.getCardName() + ".png"));
-			} catch (IOException e){
-				e.printStackTrace();
-			}
-			JLabel imgLabel = new JLabel(new ImageIcon(img));
-			hp.add(imgLabel);
-		}
-		hp.revalidate();
-		
-		JOptionPane.showMessageDialog(frmMain.getContentPane(), hp, msg, JOptionPane.PLAIN_MESSAGE);
-	}
 
-	
+
 	private void handleGameWinner(){
 		JOptionPane.showMessageDialog(frmMain.getContentPane(), "You have won the game!" , "Game Winner", JOptionPane.INFORMATION_MESSAGE);
+		try {
+			socket.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -492,26 +474,14 @@ public class ClientGUI extends Client{
 			case Optcodes.ClientNotActiveTurn:
 				isActiveTurn = false;
 				break;
-			case Optcodes.LoseTournament:
-				handleLoseTournament();
-				break;
 			case Optcodes.GameOver:
 				handleLoseGame();
-				break;
-			case Optcodes.ClientFailStartTournament:
-				handleClientFailStartTournament();
-				break;
-			case Optcodes.ClientActionCardPlayed:
-				//handleOppActionCardPlayed();
 				break;
 			case Optcodes.GameWinner:
 				handleGameWinner();
 				break;
 			case Optcodes.OppEndTurn:
 				handleOppTurnOver(1);
-				break;
-			case Optcodes.OppWithdraw:
-				handleOppTurnOver(2);
 				break;
 			default: 
 				new Exception("Unexpected Value");

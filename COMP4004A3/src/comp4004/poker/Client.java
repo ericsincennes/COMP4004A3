@@ -29,6 +29,7 @@ public class Client {
 		Client p = new Client();
 		p.connect("::",2244);
 		p.mainLoop();
+		
 	}
 
 	/**
@@ -49,7 +50,7 @@ public class Client {
 	 */
 	public boolean connect(String IPaddr, int port){
 		InetAddress host;
-
+		
 
 		try {
 			host = InetAddress.getByName("localhost");
@@ -73,7 +74,7 @@ public class Client {
 	 */
 	protected void mainLoop(){
 		playerNum = (int) get();	//get player number from server
-
+		
 		while(true){
 			Object o = get();
 			print("getting optcode from server " + o.getClass().getName() + " " + o.toString());
