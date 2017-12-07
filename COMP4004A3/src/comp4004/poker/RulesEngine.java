@@ -522,5 +522,17 @@ public class RulesEngine {
 		numPlayers--; expectedPlayers--;
 		
 	}
+	
+	/**
+	 * Initalizes a testing rules engine. All cards are squires
+	 * @param i number of expected players
+	 * @return RulesEngine
+	 */
+	public static RulesEngine testRuleEngine(int i, int j) {
+		RulesEngine test = new RulesEngine(i,j);
+		test.deck = Deck.createDeck(test.discard);
+		test.deck.testDeck();
+		return test;
+	}
 
 }

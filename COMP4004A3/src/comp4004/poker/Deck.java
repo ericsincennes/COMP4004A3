@@ -119,4 +119,11 @@ public class Deck {
 		Card toDraw = (cards.isEmpty()) ? null : cards.remove(0);
 		return toDraw;
 	}
+	
+	public void testDeck(){
+		//entire deck of 2 of hearts
+		for (int i=0;i<52;i++) {
+			cards.add(new Card(CardSuit.Hearts, 2));
+		}
+	}
 }
