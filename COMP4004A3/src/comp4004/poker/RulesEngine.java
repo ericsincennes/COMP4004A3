@@ -84,7 +84,7 @@ public class RulesEngine {
 	 * @return player number of the first tournament starter
 	 */
 	public synchronized long initFGame(){
-		Collections.shuffle(playersList);
+		//Collections.shuffle(playersList);
 		//notifyAll();
 		for(Player p : playersList){
 			for(int i = 0; i < 5; i++){
