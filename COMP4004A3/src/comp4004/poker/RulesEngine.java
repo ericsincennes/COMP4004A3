@@ -16,13 +16,12 @@ public class RulesEngine {
 	private HashMap<Long, Player> players;
 	private List<Player> playersList;
 	private List<Card> exchangeList = new ArrayList<Card>();
-	private int numPlayers = 0, expectedPlayers, expectedai;
+	private int numPlayers = 0, expectedPlayers;
 	private Deck deck, discard;
 	protected long first;
 
-	public RulesEngine(int i, int j){
+	public RulesEngine(int i){
 		expectedPlayers = i;
-		expectedai = i-j;
 		players = new HashMap<Long, Player>();
 		playersList = new ArrayList<Player>();
 		discard = Deck.createDiscard();
@@ -588,8 +587,8 @@ public class RulesEngine {
 	 * @param i number of expected players
 	 * @return RulesEngine
 	 */
-	public static RulesEngine testRuleEngine(int i, int j) {
-		RulesEngine test = new RulesEngine(i,j);
+	public static RulesEngine testRuleEngine(int i) {
+		RulesEngine test = new RulesEngine(i);
 		test.deck = Deck.createDeck(test.discard);
 		test.deck.testDeck();
 		return test;

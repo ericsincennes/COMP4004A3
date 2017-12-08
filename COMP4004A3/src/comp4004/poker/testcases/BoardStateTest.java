@@ -18,7 +18,7 @@ public class BoardStateTest {
 	
 	@Before
 	public void setUp() throws Exception {
-		rules = RulesEngine.testRuleEngine(3, 0);
+		rules = RulesEngine.testRuleEngine(3);
 		rules.registerThread(1);
 		rules.registerThread(2);
 		rules.registerThread(3);

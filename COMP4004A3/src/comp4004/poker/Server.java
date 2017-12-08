@@ -17,8 +17,8 @@ import comp4004.poker.ai.*;
 public class Server{
 
 	private int 			port = 0;
-	private int 			numplayers;
-	private int 			numhumans;
+	private int 			numplayers = -1;
+	private int 			numhumans = -1;
 	private boolean 		isAcceptingConnections = true;
 	private ServerSocket 	listeningSocket;
 	private BlockingQueue<List<Object>> eventQueue; //interthread communication - active thread will never poll but will be only sender
@@ -38,12 +38,12 @@ public class Server{
 			numplayers = in.nextInt();
 		}
 		
-		while(numhumans < numplayers || numhumans > numplayers){
+		while(numhumans < 0 || numhumans > numplayers){
 			print("Enter number of human players (between 1 and "+ numplayers +")");
 			numhumans = in.nextInt();
 		}
 		in.close();
-		rules = new RulesEngine(numplayers, numhumans);
+		rules = new RulesEngine(numplayers);
 		eventQueue = new LinkedBlockingQueue<List<Object>>();
 		connectAndRecieve(numhumans);
 	}
@@ -55,7 +55,8 @@ public class Server{
 			listeningSocket = new ServerSocket(port);
 			ArrayList<PlayerThread> threads = new ArrayList<PlayerThread>();
 			while(isAcceptingConnections){
-
+				if (count == 0) { break; }
+				
 				Socket clientSocket = listeningSocket.accept();
 
 				print(getTimestamp() + ": New client connected from address " + clientSocket.getInetAddress() + " on port " +clientSocket.getPort());
@@ -247,7 +248,9 @@ public class Server{
 								break;
 							}
 							else {
-								send(Optcodes.ClientActiveTurn);
+								if (!isAI) {
+									send(Optcodes.ClientActiveTurn);
+								}
 								continue;
 							}
 						} else if (cardIndex == -2) {
@@ -365,8 +368,8 @@ public class Server{
 				send(((Long) event.get(0)).toString());
 				break;
 			case "endturn":
-				send(Optcodes.OppEndTurn);
-				send(event.get(0));
+				//send(Optcodes.OppEndTurn);
+				//send(event.get(0));
 				break;
 			default:
 				break;

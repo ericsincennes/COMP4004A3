@@ -1,0 +1,98 @@
+Dec 08, 2017 12:27:08 AM comp4004.poker.testcases.Log <init>
+INFO: Logger Configured
+Dec 08, 2017 12:27:29 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 2
+Dec 08, 2017 12:27:29 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 1
+Dec 08, 2017 12:27:29 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 starting up.
+Dec 08, 2017 12:27:29 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 151
+Dec 08, 2017 12:27:29 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 starting up.
+Dec 08, 2017 12:27:29 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:32 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 4 from thread 12
+Dec 08, 2017 12:27:32 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12: attempting to play card 4: 2 of Hearts
+Dec 08, 2017 12:27:32 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 202
+Dec 08, 2017 12:27:32 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12: successfully discarded card 4: 2 of Hearts
+Dec 08, 2017 12:27:32 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:34 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 0 from thread 12
+Dec 08, 2017 12:27:34 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12: attempting to play card 0: 9 of Spades
+Dec 08, 2017 12:27:34 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 202
+Dec 08, 2017 12:27:34 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12: successfully discarded card 0: 9 of Spades
+Dec 08, 2017 12:27:34 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:36 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 104 from thread 12
+Dec 08, 2017 12:27:36 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12: exchanged cards.
+Dec 08, 2017 12:27:36 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 104
+Dec 08, 2017 12:27:36 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:37 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 103 from thread 12
+Dec 08, 2017 12:27:37 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12: ended turn.
+Dec 08, 2017 12:27:37 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 151
+Dec 08, 2017 12:27:37 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:43 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 0 from thread 11
+Dec 08, 2017 12:27:43 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11: attempting to play card 0: 2 of Spades
+Dec 08, 2017 12:27:43 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 202
+Dec 08, 2017 12:27:43 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11: successfully discarded card 0: 2 of Spades
+Dec 08, 2017 12:27:43 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:45 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 1 from thread 11
+Dec 08, 2017 12:27:45 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11: attempting to play card 1: 5 of Diamonds
+Dec 08, 2017 12:27:45 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 202
+Dec 08, 2017 12:27:45 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11: successfully discarded card 1: 5 of Diamonds
+Dec 08, 2017 12:27:45 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:47 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 1 from thread 11
+Dec 08, 2017 12:27:47 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11: attempting to play card 1: 4 of Diamonds
+Dec 08, 2017 12:27:47 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 202
+Dec 08, 2017 12:27:47 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11: successfully discarded card 1: 4 of Diamonds
+Dec 08, 2017 12:27:47 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:48 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 104 from thread 11
+Dec 08, 2017 12:27:48 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11: exchanged cards.
+Dec 08, 2017 12:27:48 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 104
+Dec 08, 2017 12:27:48 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11 sending a java.lang.Integer 102
+Dec 08, 2017 12:27:49 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Integer 103 from thread 11
+Dec 08, 2017 12:27:49 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 11: ended turn.
+Dec 08, 2017 12:27:49 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 151
+Dec 08, 2017 12:27:49 AM comp4004.poker.testcases.Log logmsg
+INFO: Thread 12 sending a java.lang.Integer 102
+Dec 08, 2017 12:28:21 AM comp4004.poker.testcases.Log logmsg
+INFO: Received a java.lang.Object java.lang.Object@4430a9a5 from thread 12
