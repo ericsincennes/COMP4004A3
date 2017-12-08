@@ -10,7 +10,7 @@ public class Player {
 	private long id;
 	private boolean isPlaying = false;
 	private boolean turnOver = false;
-	private int handStrength = 0;
+	private boolean ai = false;
 	public boolean hasPlayedToBoard = false;
 	
 	
@@ -31,6 +31,10 @@ public class Player {
 		return turnOver;
 	}
 	
+	public boolean getAI() {
+		return ai;
+	}
+	
 	public void removeCard(String s) {
 		hand.remove(s);
 	}
@@ -43,20 +47,16 @@ public class Player {
 		turnOver = t;
 	}
 	
+	public void setAI(boolean t) {
+		ai = t;
+	}
+	
 	/**
 	 * Draws a card  and adds it to hand
 	 * @param c Card
 	 */
 	public void addCard(Card c){
 		hand.add(c);
-	}
-	
-	public int getHandStrength() {
-		return handStrength;
-	}
-	
-	public void setHandStrength(int val) {
-		handStrength = val;
 	}
 	
 	public int getHandSize(){

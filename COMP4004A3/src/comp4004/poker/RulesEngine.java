@@ -18,6 +18,7 @@ public class RulesEngine {
 	private List<Card> exchangeList = new ArrayList<Card>();
 	private int numPlayers = 0, expectedPlayers, expectedai;
 	private Deck deck, discard;
+	protected long first;
 
 	public RulesEngine(int i, int j){
 		expectedPlayers = i;
@@ -84,14 +85,15 @@ public class RulesEngine {
 	 * @return player number of the first tournament starter
 	 */
 	public synchronized long initFGame(){
-		//Collections.shuffle(playersList);
+		Collections.reverse(playersList);
 		//notifyAll();
 		for(Player p : playersList){
 			for(int i = 0; i < 5; i++){
 				drawHidCard(p.getID());
 			}
 		}
-		return playersList.get(0).getID();
+		first = playersList.get(0).getID();
+		return first;
 	}
 	
 	public void initGame(){
@@ -115,7 +117,6 @@ public class RulesEngine {
 		Player p = getPlayerById(id);
 		if(p.getPlaying()){
 			p.hasPlayedToBoard = false;
-			//p.addCard(deck.draw());
 			return true;
 		} else {
 			Collections.rotate(playersList, -1);
@@ -156,6 +157,25 @@ public class RulesEngine {
 		return true;
 	}
 	
+	public synchronized boolean discardCard(String cardname, Long id){
+		Player p = players.get(id);
+		Card c;
+		//Check if the card is in the players hand
+		if(p.getHand().contains(cardname)){
+			c = p.getHand().getCardByName(cardname);
+		} else {
+			return false;
+		}
+		//Null checker
+		if (c == null) {
+			notifyAll();
+			return false; 
+		}
+		exchangeList.add(c);
+		p.getHand().remove(cardname);
+		return true;
+	}
+	
 	public void exchangeCard(long id){
 		Player p = getPlayerById(id);
 		for (Card c : exchangeList){
@@ -190,10 +210,12 @@ public class RulesEngine {
 		} else {
 			hand.setStrength(Strength.HighCard);
 			hand.setTieBreaker(h.get(4));
+			hand.setPTieBreaker(h.get(3));
 		}
 		System.out.println(hand.getStrength());
 	}
 	
+	//four of a kind
 	public boolean isFOK(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(3).getCardValue() || h.get(1).getCardValue() == h.get(4).getCardValue()) {
 			hand.setTieBreaker(h.get(1));
@@ -202,10 +224,13 @@ public class RulesEngine {
 		return false;
 	}
 	
+	//full house
 	public boolean isFH(List<Card> h, Hand hand) {
+		//low three of a kind and high pair
 		if (h.get(0).getCardValue() == h.get(2).getCardValue() && h.get(3).getCardValue() == h.get(4).getCardValue()) {
 			hand.setTieBreaker(h.get(0));
 			return true;
+		//low pair and high three of a kind
 		} else if (h.get(2).getCardValue() == h.get(4).getCardValue() && h.get(0).getCardValue() == h.get(1).getCardValue()) {
 			hand.setTieBreaker(h.get(4));
 			return true;
@@ -213,6 +238,7 @@ public class RulesEngine {
 		return false;
 	}
 	
+	//three of a kind
 	public boolean isTOK(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(2).getCardValue() && h.get(3).getCardValue() != h.get(4).getCardValue()) {
 			hand.setTieBreaker(h.get(0));
@@ -227,6 +253,7 @@ public class RulesEngine {
 		return false;
 	}
 	
+	//two pair
 	public boolean isTP(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(1).getCardValue() && h.get(2).getCardValue() == h.get(3).getCardValue()) {
 			if (h.get(0).getCardValue() > h.get(2).getCardValue()) {
@@ -265,6 +292,7 @@ public class RulesEngine {
 		return false;
 	}
 	
+	//one pair
 	public boolean isOP(List<Card> h, Hand hand) {
 		if (h.get(0).getCardValue() == h.get(1).getCardValue() && (h.get(2).getCardValue() != h.get(3).getCardValue() && h.get(3).getCardValue() != h.get(4).getCardValue())) {
 			hand.setTieBreaker(h.get(0));
@@ -286,15 +314,22 @@ public class RulesEngine {
 		return false;
 	}
 	
+	//straight
 	public boolean isStr(List<Card> h, Hand hand) {
-		if (h.get(0).getCardValue() == h.get(1).getCardValue()+1 && (h.get(0).getCardValue() == h.get(2).getCardValue()+2 
-						&& h.get(0).getCardValue() == h.get(3).getCardValue()+3 && h.get(0).getCardValue() == h.get(4).getCardValue()+4)) {
+		if (h.get(0).getCardValue()+1 == h.get(1).getCardValue() && h.get(0).getCardValue()+2 == h.get(2).getCardValue() 
+						&& h.get(0).getCardValue()+3 == h.get(3).getCardValue() && h.get(0).getCardValue()+4 == h.get(4).getCardValue()) {
 			hand.setTieBreaker(h.get(4));
 			return true;
-		} 
+		//ace low card straight
+		} else if (h.get(0).getCardValue()+1 == h.get(1).getCardValue() && h.get(0).getCardValue()+2 == h.get(2).getCardValue() 
+				&& h.get(0).getCardValue()+3 == h.get(3).getCardValue() && h.get(0).getCardValue()+12 == h.get(4).getCardValue()) {
+			hand.setTieBreaker(h.get(3));
+			return true;
+		}
 		return false;
 	}
 	
+	//flush
 	public boolean isFlush(List<Card> h, Hand hand) {
 		if (h.get(0).getCardSuit() == h.get(1).getCardSuit() && (h.get(0).getCardSuit() == h.get(2).getCardSuit() 
 				&& h.get(0).getCardSuit() == h.get(3).getCardSuit() && h.get(0).getCardSuit() == h.get(4).getCardSuit())) {
@@ -304,6 +339,7 @@ public class RulesEngine {
 		return false;
 	}
 	
+	//straight flush
 	public boolean isStrFlu(List<Card> h, Hand hand) {
 		if (isFlush(h, hand) && isStr(h, hand)) {
 			hand.setTieBreaker(h.get(4));
@@ -312,6 +348,7 @@ public class RulesEngine {
 		return false;
 	}
 	
+	//royal flush
 	public boolean isRoyal(List<Card> h, Hand hand) {
 		if (isStrFlu(h, hand) && h.get(0).getCardValue() == 1 && h.get(4).getCardValue() == 13) {
 			hand.setTieBreaker(h.get(4));
@@ -331,8 +368,9 @@ public class RulesEngine {
 	 */
 	public boolean endTurn(long id){
 		players.get(id).hasPlayedToBoard = false;
-		exchangeCard(id);
+		//exchangeCard(id);
 		players.get(id).setTurnOver(true);
+		//players.get(id).setPlaying(false);
 		Collections.rotate(playersList, -1);
 		return true;
 	}
@@ -363,7 +401,6 @@ public class RulesEngine {
 				determineHandStrength(p);
 			}
 		}
-		System.out.println("Hey");
 		for (Player p : playersList) {
 			if (winner == null) {
 				winner = p;
@@ -371,16 +408,20 @@ public class RulesEngine {
 			} else {
 				if (winner.getHand().getStrength().ordinal() > p.getHand().getStrength().ordinal()) {
 					winner = p;
+					//check in strength order
 				} else if (winner.getHand().getStrength() == p.getHand().getStrength()) {
 					switch (winner.getHand().getStrength()) {
 						case Royal:
+							//compare suits
 							if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
 								winner = p;
 							}
 							return winner;
 						case StrFlush:
+							//compare high card
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
+							//compare suits
 							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
 								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
 									winner = p;
@@ -388,18 +429,22 @@ public class RulesEngine {
 							}
 							return winner;
 						case FourOK:
+							//compare values
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
 							}
 							return winner;
 						case FullHouse:
+							//compare values of three of a kind
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
 							}
 							return winner;
 						case Flush:
+							//compare high card
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
+							//compare suits
 							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
 								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
 									winner = p;
@@ -407,8 +452,10 @@ public class RulesEngine {
 							}
 							return winner;
 						case Straight:
+							//compare high card
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
+							//compare suits
 							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
 								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
 									winner = p;
@@ -416,19 +463,24 @@ public class RulesEngine {
 							}
 							return winner;
 						case ThreeOK:
+							//compare values
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
 							}
 							return winner;
 						case TwoPair:
+							//compare values of higher pair
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
+							//compare values of lower pair
 							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
 								if (winner.getHand().getPTieBreaker().getCardValue() < p.getHand().getPTieBreaker().getCardValue()) {
 									winner = p;
+									//compare value of remaining card
 								} else if (winner.getHand().getPTieBreaker().getCardValue() == p.getHand().getPTieBreaker().getCardValue()) {
 									if (winner.getHand().getHigh().getCardValue() < p.getHand().getHigh().getCardValue()) {
 										winner = p;
+									//compare suit of remaining card
 									} else if (winner.getHand().getHigh().getCardValue() == p.getHand().getHigh().getCardValue()) {
 										if (winner.getHand().getHigh().getCardSuit().ordinal() > p.getHand().getHigh().getCardSuit().ordinal()) {
 											winner = p;
@@ -438,11 +490,14 @@ public class RulesEngine {
 							}
 							return winner;
 						case OnePair:
+							//compare value of pair
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
+							//compare value of high card
 							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
 								if (winner.getHand().getPTieBreaker().getCardValue() < p.getHand().getPTieBreaker().getCardValue()) {
 									winner = p;
+									//compare suit of high card
 								} else if (winner.getHand().getPTieBreaker().getCardValue() == p.getHand().getPTieBreaker().getCardValue()) {
 									if (winner.getHand().getPTieBreaker().getCardSuit().ordinal() > p.getHand().getPTieBreaker().getCardSuit().ordinal()) {
 										winner = p;
@@ -451,8 +506,10 @@ public class RulesEngine {
 							}
 							return winner;
 						case HighCard:
+							//compare value
 							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
 								winner = p;
+							//compare suit
 							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
 								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
 									winner = p;
@@ -496,7 +553,10 @@ public class RulesEngine {
 	public void setDeck(Deck d){
 		deck = d;
 	}
-	
+
+	public long getFirst(){
+		return first;
+	}
 	/**
 	 * Gets the boardstate of a player, that is all publicly available info for that player
 	 * @param p the player who's boardstate we're fetching

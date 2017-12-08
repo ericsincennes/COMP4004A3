@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import comp4004.poker.Card.*;
 import comp4004.poker.testcases.Log;
 import comp4004.poker.Optcodes;
+import comp4004.poker.ai.*;
 
 public class Server{
 
@@ -44,7 +45,7 @@ public class Server{
 		in.close();
 		rules = new RulesEngine(numplayers, numhumans);
 		eventQueue = new LinkedBlockingQueue<List<Object>>();
-		connectAndRecieve(numplayers);
+		connectAndRecieve(numhumans);
 	}
 
 	private void connectAndRecieve(int count){
@@ -68,7 +69,11 @@ public class Server{
 					break;
 				}
 			}
-
+			
+			for (int i = 0; i<(numplayers-numhumans); i++) {
+				threads.add(new PlayerThread(true));
+			}
+			
 			print(getTimestamp() +": Expected number of clients connected. Starting Game");
 			rules.initFGame();
 			for(PlayerThread p : threads){
@@ -119,6 +124,7 @@ public class Server{
 		private ObjectInputStream in;
 		private long threadID = getId(); //used to identify the individual threads in the rules/logic engine
 		private int playerNum;
+		StrategyContext strat = new StrategyContext();
 
 		public PlayerThread(Socket c){
 			client = c;
@@ -132,37 +138,58 @@ public class Server{
 				e.printStackTrace();
 			}	
 		}
+		
+		public PlayerThread(boolean ai){
+			playerNum = rules.registerThread(threadID);
+			rules.getPlayerById(threadID).setAI(ai);
+		}
 
 		public void run(){
 			//log.logmsg(threadID + ": Main loop started");
-
+			boolean isAI = rules.getPlayerById(threadID).getAI();
+			BoardState b = getBoardStateAI();
 			//Send player their player number
-			send(playerNum);
-			sendBoardState();
+			if (!isAI) {
+				send(playerNum);
+				sendBoardState();
+			} else {
+				b = getBoardStateAI();
+			}
 			log.logmsg("Thread " + threadID + " starting up.");
 			while(isRunning){
 				if (rules.gameWinner() != null) {
-					System.out.println("Hi");
+					rules.getPlayerById(threadID).setPlaying(false);
 					if (rules.gameWinner().getID() == threadID) {
 						//send winner msg to client
-						send(Optcodes.GameWinner);
+						if (!isAI) {
+							send(Optcodes.GameWinner);
+						}
 					}
 					else {
-						send(Optcodes.GameOver);
-						send(Long.valueOf(rules.gameWinner().getID()));
+						if (!isAI) {
+							send(Optcodes.GameOver);
+							send(Long.valueOf(rules.gameWinner().getID()));
+						}
 					}
 					break;
 				}
 
 				if (rules.getPlayerList().get(0).getID() != threadID) {
 					try {
-						//updateClientBoardState();
-						send(Optcodes.ClientNotActiveTurn);
-						List<Object> event = eventQueue.poll(200, TimeUnit.MILLISECONDS);
-						if (event != null) {
-							handleEvent(event);
+						if (!isAI) {
+							send(Optcodes.ClientNotActiveTurn);
+							List<Object> event = eventQueue.poll(200, TimeUnit.MILLISECONDS);
+							if (event != null) {
+								handleEvent(event);
+							}
+							sendBoardState();
+						} else {
+							List<Object> event = eventQueue.poll(200, TimeUnit.MILLISECONDS);
+							if (event != null) {
+								handleEvent(event);
+							}
+							b = getBoardStateAI();
 						}
-						sendBoardState();
 						continue;
 					} catch (InterruptedException ie) {
 						ie.printStackTrace();
@@ -177,17 +204,34 @@ public class Server{
 					if (!rules.startTurn(threadID)) {
 						continue;
 					}
-					send(Optcodes.ClientActiveTurn);
-
-					//Send updated hand to client
-					sendBoardState();
-
+					if (!isAI) {
+						send(Optcodes.ClientActiveTurn);
+						//Send updated hand to client
+						sendBoardState();
+					} else {
+						b = getBoardStateAI();
+					}
 					//get what cards the client wants to play
 					int cardIndex = -1;
 					
 					while(true){
-						//while not end turn optcode
-						cardIndex = getCardsToBePlayed();
+						if (!isAI) {
+							//while not end turn optcode
+							cardIndex = getCardsToBePlayed();
+						} else {
+							//execute strategy then end turn
+							if (!(rules.getFirst() == threadID)) {
+								strat.setStrategy(new StrategyTwo());
+								cardIndex = strat.executeStrategy(rules, b, threadID);
+								if (cardIndex == 0) {
+									strat.setStrategy(new StrategyOne());
+									cardIndex = strat.executeStrategy(rules, b, threadID);
+								}
+							} else {
+								strat.setStrategy(new StrategyOne());
+								cardIndex = strat.executeStrategy(rules, b, threadID);
+							}
+						}
 					
 						if(cardIndex == -3) { 
 							//end turn optcode received
@@ -197,7 +241,9 @@ public class Server{
 								eventmsg.add(Long.valueOf(threadID));
 								eventmsg.add("endturn");
 								sendEvent(eventmsg);
-								send(Optcodes.ClientNotActiveTurn);
+								if (!isAI) {
+									send(Optcodes.ClientNotActiveTurn);
+								}
 								break;
 							}
 							else {
@@ -245,6 +291,7 @@ public class Server{
 					rules.initGame();
 				}
 			}
+			
 		}
 		
 		/**
@@ -254,6 +301,10 @@ public class Server{
 			BoardState board = rules.makeBoardState(rules.getPlayerById(threadID));
 			send(Optcodes.ClientUpdateBoardState);
 			send(board);
+		}
+		
+		private BoardState getBoardStateAI() {
+			return rules.makeBoardState(rules.getPlayerById(threadID));
 		}
 
 		/**
@@ -299,7 +350,7 @@ public class Server{
 		/**
 		 * handles an event, somehow
 		 * @param event - the event msg received, with prepended sender ID
-		 * @return whatever it needs to, mainly for ivanhoe and adapt
+		 * @return whatever it needs to
 		 */
 		private Object handleEvent(List<Object> event) {
 			if (event == null || event.size() < 2) { return null; }

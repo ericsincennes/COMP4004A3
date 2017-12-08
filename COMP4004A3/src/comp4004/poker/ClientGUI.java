@@ -364,7 +364,7 @@ public class ClientGUI extends Client{
 	}
 	
 	public void handleSuccessfulCardPlay(){
-		JOptionPane.showMessageDialog(frmMain.getContentPane(), "Card Exchanged", "Card Exchanged", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(frmMain.getContentPane(), "Card Discarded", "Card Discarded", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	public void updateInformationLabel(String text){
