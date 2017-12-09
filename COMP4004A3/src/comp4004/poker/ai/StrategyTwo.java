@@ -13,7 +13,7 @@ public class StrategyTwo implements Strategy{
 		Hand hand = p.getHand();
 		r.determineHandStrength(p);
 		//hand is better than three of a kind = keep it
-		if (hand.getStrength().ordinal() < Strength.ThreeOK.ordinal()) {
+		if (hand.getStrength().getStrengthRank() < Strength.ThreeOK.getStrengthRank()) {
 			return -3;
 		} else if (suited(b)) {
 			int s = 0, h = 0, c = 0, d = 0;

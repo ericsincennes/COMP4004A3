@@ -9,7 +9,17 @@ import java.io.Serializable;
 public class Card implements Serializable, Comparable<Card>{
 	
 	public enum CardSuit {
-		Spades, Hearts, Clubs, Diamonds
+		
+		Spades(1), Hearts(2), Clubs(3), Diamonds(4);
+		
+		private final int rank;
+		private CardSuit(int val) {
+			this.rank = val;
+		}
+		
+		public int getSuitRank() {
+			return rank;
+		}
 	}
 	
 	protected String cardName;

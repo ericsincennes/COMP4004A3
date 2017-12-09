@@ -48,8 +48,7 @@ public class RulesEngine {
 		if(players.containsKey(ID)){
 			notifyAll();
 			return -1;
-		}
-		else if(numPlayers >= expectedPlayers){
+		}else if(numPlayers >= expectedPlayers){
 			notifyAll();
 			return -1;
 		}
@@ -211,7 +210,7 @@ public class RulesEngine {
 			hand.setTieBreaker(h.get(4));
 			hand.setPTieBreaker(h.get(3));
 		}
-		System.out.println(hand.getStrength());
+		//System.out.println(hand.getStrength());
 	}
 	
 	//four of a kind
@@ -349,7 +348,7 @@ public class RulesEngine {
 	
 	//royal flush
 	public boolean isRoyal(List<Card> h, Hand hand) {
-		if (isStrFlu(h, hand) && h.get(0).getCardValue() == 1 && h.get(4).getCardValue() == 13) {
+		if (isStrFlu(h, hand) && h.get(0).getCardValue() == 10 && h.get(4).getCardValue() == 14) {
 			hand.setTieBreaker(h.get(4));
 			return true;
 		}
@@ -366,6 +365,7 @@ public class RulesEngine {
 	 * @return boolean
 	 */
 	public boolean endTurn(long id){
+		determineHandStrength(getPlayerById(id));
 		players.get(id).hasPlayedToBoard = false;
 		//exchangeCard(id);
 		players.get(id).setTurnOver(true);
@@ -400,125 +400,133 @@ public class RulesEngine {
 				determineHandStrength(p);
 			}
 		}
-		for (Player p : playersList) {
+		for (Player p2 : playersList) {
 			if (winner == null) {
-				winner = p;
-				System.out.println(winner);
+				winner = p2;
+				//System.out.println(winner + "first in list");
 			} else {
-				if (winner.getHand().getStrength().ordinal() > p.getHand().getStrength().ordinal()) {
-					winner = p;
+				if (winner.getHand().getStrength().getStrengthRank() > p2.getHand().getStrength().getStrengthRank()) {
+					//System.out.println(winner.getHand().getStrength() + "p1");
+					//System.out.println(p2.getHand().getStrength() + "p2");
+					winner = p2;
+					//System.out.println(winner + "stronger hand than p1");
 					//check in strength order
-				} else if (winner.getHand().getStrength() == p.getHand().getStrength()) {
+				} else if (winner.getHand().getStrength().getStrengthRank() == p2.getHand().getStrength().getStrengthRank()) {
 					switch (winner.getHand().getStrength()) {
 						case Royal:
 							//compare suits
-							if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardSuit().getSuitRank() > p2.getHand().getTieBreaker().getCardSuit().getSuitRank()) {
+							//	System.out.println(winner + "royal flush new winner");
+								winner = p2;
 							}
-							return winner;
+							break;
 						case StrFlush:
 							//compare high card
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							//compare suits
-							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
-								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
-									winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p2.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getTieBreaker().getCardSuit().getSuitRank() > p2.getHand().getTieBreaker().getCardSuit().getSuitRank()) {
+									winner = p2;
 								}
 							}
-							return winner;
+							break;
 						case FourOK:
 							//compare values
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							}
-							return winner;
+							break;
 						case FullHouse:
 							//compare values of three of a kind
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							}
-							return winner;
+							break;
 						case Flush:
 							//compare high card
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							//compare suits
-							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
-								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
-									winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p2.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getTieBreaker().getCardSuit().getSuitRank() > p2.getHand().getTieBreaker().getCardSuit().getSuitRank()) {
+									winner = p2;
 								}
 							}
-							return winner;
+							break;
 						case Straight:
 							//compare high card
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							//compare suits
-							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
-								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
-									winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p2.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getTieBreaker().getCardSuit().getSuitRank() > p2.getHand().getTieBreaker().getCardSuit().getSuitRank()) {
+									winner = p2;
 								}
 							}
-							return winner;
+							break;
 						case ThreeOK:
 							//compare values
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							}
-							return winner;
+							break;
 						case TwoPair:
 							//compare values of higher pair
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							//compare values of lower pair
-							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
-								if (winner.getHand().getPTieBreaker().getCardValue() < p.getHand().getPTieBreaker().getCardValue()) {
-									winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p2.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getPTieBreaker().getCardValue() < p2.getHand().getPTieBreaker().getCardValue()) {
+									winner = p2;
 									//compare value of remaining card
-								} else if (winner.getHand().getPTieBreaker().getCardValue() == p.getHand().getPTieBreaker().getCardValue()) {
-									if (winner.getHand().getHigh().getCardValue() < p.getHand().getHigh().getCardValue()) {
-										winner = p;
+								} else if (winner.getHand().getPTieBreaker().getCardValue() == p2.getHand().getPTieBreaker().getCardValue()) {
+									if (winner.getHand().getHigh().getCardValue() < p2.getHand().getHigh().getCardValue()) {
+										winner = p2;
 									//compare suit of remaining card
-									} else if (winner.getHand().getHigh().getCardValue() == p.getHand().getHigh().getCardValue()) {
-										if (winner.getHand().getHigh().getCardSuit().ordinal() > p.getHand().getHigh().getCardSuit().ordinal()) {
-											winner = p;
+									} else if (winner.getHand().getHigh().getCardValue() == p2.getHand().getHigh().getCardValue()) {
+										if (winner.getHand().getHigh().getCardSuit().getSuitRank() > p2.getHand().getHigh().getCardSuit().getSuitRank()) {
+											winner = p2;
 										}
 									}
 								}
 							}
-							return winner;
+							break;
 						case OnePair:
 							//compare value of pair
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							//compare value of high card
-							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
-								if (winner.getHand().getPTieBreaker().getCardValue() < p.getHand().getPTieBreaker().getCardValue()) {
-									winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p2.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getPTieBreaker().getCardValue() < p2.getHand().getPTieBreaker().getCardValue()) {
+									winner = p2;
 									//compare suit of high card
-								} else if (winner.getHand().getPTieBreaker().getCardValue() == p.getHand().getPTieBreaker().getCardValue()) {
-									if (winner.getHand().getPTieBreaker().getCardSuit().ordinal() > p.getHand().getPTieBreaker().getCardSuit().ordinal()) {
-										winner = p;
+								} else if (winner.getHand().getPTieBreaker().getCardValue() == p2.getHand().getPTieBreaker().getCardValue()) {
+									if (winner.getHand().getPTieBreaker().getCardSuit().getSuitRank() > p2.getHand().getPTieBreaker().getCardSuit().getSuitRank()) {
+										winner = p2;
 									}
 								}
 							}
-							return winner;
+							break;
 						case HighCard:
 							//compare value
-							if (winner.getHand().getTieBreaker().getCardValue() < p.getHand().getTieBreaker().getCardValue()) {
-								winner = p;
+							if (winner.getHand().getTieBreaker().getCardValue() < p2.getHand().getTieBreaker().getCardValue()) {
+								winner = p2;
 							//compare suit
-							} else if (winner.getHand().getTieBreaker().getCardValue() == p.getHand().getTieBreaker().getCardValue()) {
-								if (winner.getHand().getTieBreaker().getCardSuit().ordinal() > p.getHand().getTieBreaker().getCardSuit().ordinal()) {
-									winner = p;
+							} else if (winner.getHand().getTieBreaker().getCardValue() == p2.getHand().getTieBreaker().getCardValue()) {
+								if (winner.getHand().getTieBreaker().getCardSuit().getSuitRank() > p2.getHand().getTieBreaker().getCardSuit().getSuitRank()) {
+									winner = p2;
 								}
 							}
-							return winner;
+							break;
 						default:
 							return null;
 					}
+					//System.out.println("winner of tiebreaker");
+					return winner;
 				} 
+				//System.out.println(winner + "beat p1");
+				return winner;
 			}
 		}
 		return null;

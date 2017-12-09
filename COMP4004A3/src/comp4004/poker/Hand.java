@@ -14,7 +14,16 @@ public class Hand {
 	private List<Card> hand;
 	
 	public enum Strength {
-		Royal, StrFlush, FourOK, FullHouse, Flush, Straight, ThreeOK, TwoPair, OnePair, HighCard 
+		Royal(0), StrFlush(1), FourOK(2), FullHouse(3), Flush(4), Straight(5), ThreeOK(6), TwoPair(7), OnePair(8), HighCard(9);
+		
+		private final int rank;
+		private Strength(int val) {
+			this.rank = val;
+		}
+		
+		public int getStrengthRank() {
+			return rank;
+		}
 	}
 	
 	protected Strength strength = Strength.HighCard;
